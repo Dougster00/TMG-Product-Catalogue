@@ -26,24 +26,19 @@ h1 {
     margin-bottom: 25px;
 }
 
-.controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
-}
-
-input,
-select {
-    padding: 12px;
-    font-size: 16px;
+.search-box {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    font-size: 18px;
     border: 1px solid #bbb;
-    border-radius: 6px;
+    border-radius: 8px;
+    margin-bottom: 25px;
 }
 
-input {
-    flex: 1;
-    min-width: 250px;
+#status {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 #products {
@@ -65,32 +60,27 @@ input {
     font-size: 21px;
 }
 
-.category {
+.region {
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
-.location {
-    margin-bottom: 15px;
-    line-height: 1.5;
+.coordinates {
+    margin-bottom: 18px;
 }
 
 .teleport {
     display: inline-block;
     background: #4b6f44;
     color: white;
-    padding: 10px 16px;
+    padding: 11px 18px;
     border-radius: 6px;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .teleport:hover {
     opacity: 0.85;
-}
-
-#status {
-    text-align: center;
-    margin: 20px;
 }
 
 </style>
@@ -102,26 +92,15 @@ input {
 
 <h1>TMG PRODUCT CATALOGUE</h1>
 
-<div class="controls">
-
 <input
     type="text"
     id="search"
+    class="search-box"
     placeholder="Search products..."
 >
 
-<select id="category">
-
-<option value="">
-All Categories
-</option>
-
-</select>
-
-</div>
-
 <div id="status">
-Loading products...
+    Loading products...
 </div>
 
 <div id="products"></div>
@@ -131,8 +110,23 @@ Loading products...
 
 <script>
 
+/*
+==================================================
+TMG PRODUCT CATALOGUE
+Google Sheet columns:
+
+A = PRODUCT
+B = REGION
+C = X
+D = Y
+E = Z
+==================================================
+*/
+
+
 const SHEET_ID =
 "1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
+
 
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/" +
@@ -143,7 +137,9 @@ SHEET_ID +
 let products = [];
 
 
-/* LOAD GOOGLE SHEET */
+/*
+LOAD GOOGLE SHEET
+*/
 
 fetch(SHEET_URL)
 
@@ -156,6 +152,7 @@ fetch(SHEET_URL)
             text.substring(47).slice(0, -2)
         );
 
+
     const rows =
         json.table.rows;
 
@@ -165,32 +162,28 @@ fetch(SHEET_URL)
 
             const cells = row.c;
 
+
             return {
 
                 product:
                     cells[0]?.v || "",
 
-                category:
+                region:
                     cells[1]?.v || "",
 
-                region:
+                x:
                     cells[2]?.v || "",
 
-                x:
+                y:
                     cells[3]?.v || "",
 
-                y:
-                    cells[4]?.v || "",
-
                 z:
-                    cells[5]?.v || ""
+                    cells[4]?.v || ""
 
             };
 
         });
 
-
-    createCategories();
 
     displayProducts(products);
 
@@ -207,44 +200,9 @@ fetch(SHEET_URL)
 });
 
 
-/* CREATE CATEGORY LIST */
-
-function createCategories() {
-
-    const categorySelect =
-        document.getElementById("category");
-
-
-    const categories =
-        [...new Set(
-
-            products
-            .map(p => p.category)
-            .filter(Boolean)
-
-        )]
-        .sort();
-
-
-    categories.forEach(category => {
-
-        const option =
-            document.createElement("option");
-
-        option.value =
-            category;
-
-        option.textContent =
-            category;
-
-        categorySelect.appendChild(option);
-
-    });
-
-}
-
-
-/* DISPLAY PRODUCTS */
+/*
+DISPLAY PRODUCTS
+*/
 
 function displayProducts(list) {
 
@@ -269,31 +227,42 @@ function displayProducts(list) {
 
 
         /*
-        IMPORTANT:
+        BUILD SECOND LIFE SLURL
 
-        Second Life SLURL format:
+        Example:
 
-        region/X/Y/Z
+        EDEN PHOENIX
+        129
+        95
+        701
+
+        becomes:
+
+        https://maps.secondlife.com/secondlife/
+        EDEN%20PHOENIX/129/95/701
         */
 
 
         const region =
-            product.region.trim();
+            String(product.region)
+            .trim()
+            .replace(/ /g, "%20");
 
 
         const slurl =
             "https://maps.secondlife.com/secondlife/" +
-            region.replace(/ /g, "%20") +
+            region +
             "/" +
-            product.x +
+            String(product.x).trim() +
             "/" +
-            product.y +
+            String(product.y).trim() +
             "/" +
-            product.z;
+            String(product.z).trim();
 
 
         const card =
             document.createElement("div");
+
 
         card.className =
             "product";
@@ -305,22 +274,14 @@ function displayProducts(list) {
                 ${escapeHTML(product.product)}
             </h2>
 
-            <div class="category">
-                ${escapeHTML(product.category)}
+            <div class="region">
+                ${escapeHTML(product.region)}
             </div>
 
-            <div class="location">
-
-                <strong>
-                    ${escapeHTML(product.region)}
-                </strong>
-
-                <br>
-
-                ${product.x},
-                ${product.y},
-                ${product.z}
-
+            <div class="coordinates">
+                ${escapeHTML(product.x)},
+                ${escapeHTML(product.y)},
+                ${escapeHTML(product.z)}
             </div>
 
             <a
@@ -342,43 +303,26 @@ function displayProducts(list) {
 }
 
 
-/* SEARCH + CATEGORY */
+/*
+SEARCH
+*/
 
-function filterProducts() {
+function searchProducts() {
 
     const search =
         document
         .getElementById("search")
         .value
-        .toLowerCase();
-
-
-    const category =
-        document
-        .getElementById("category")
-        .value;
+        .toLowerCase()
+        .trim();
 
 
     const filtered =
         products.filter(product => {
 
-
-            const matchesSearch =
-
-                product.product
+            return product.product
                 .toLowerCase()
                 .includes(search);
-
-
-            const matchesCategory =
-
-                !category ||
-                product.category === category;
-
-
-            return
-                matchesSearch &&
-                matchesCategory;
 
         });
 
@@ -388,7 +332,9 @@ function filterProducts() {
 }
 
 
-/* SAFELY DISPLAY TEXT */
+/*
+SAFE TEXT DISPLAY
+*/
 
 function escapeHTML(text) {
 
@@ -407,21 +353,15 @@ function escapeHTML(text) {
 }
 
 
-/* EVENTS */
+/*
+SEARCH BOX
+*/
 
 document
 .getElementById("search")
 .addEventListener(
     "input",
-    filterProducts
-);
-
-
-document
-.getElementById("category")
-.addEventListener(
-    "change",
-    filterProducts
+    searchProducts
 );
 
 </script>
