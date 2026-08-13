@@ -7,188 +7,131 @@
 <meta charset="UTF-8">
 
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+content="width=device-width, initial-scale=1.0">
 
 <title>TMG Product Catalogue</title>
 
-
 <style>
 
-/* ==========================================
-   PAGE
-   ========================================== */
-
 body {
-
     font-family: Arial, sans-serif;
-
     background: #f4f1ea;
-
     margin: 0;
-
     padding: 30px;
-
     color: #333;
-
 }
-
 
 .container {
-
     max-width: 1100px;
-
     margin: auto;
-
 }
-
-
-/* ==========================================
-   TITLE
-   ========================================== */
 
 h1 {
-
     text-align: center;
-
     margin-bottom: 25px;
-
 }
-
-
-/* ==========================================
-   SEARCH
-   ========================================== */
 
 .search-box {
-
     width: 100%;
-
     box-sizing: border-box;
-
     padding: 14px;
-
     font-size: 18px;
-
     border: 1px solid #bbb;
-
     border-radius: 8px;
-
     margin-bottom: 20px;
-
 }
 
+.sort-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
 
-/* ==========================================
-   STATUS
-   ========================================== */
+.sort-box select {
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+}
 
 #status {
-
     text-align: center;
-
     margin-bottom: 20px;
-
 }
-
-
-/* ==========================================
-   PRODUCTS
-   ========================================== */
 
 #products {
-
     display: grid;
-
     grid-template-columns:
         repeat(auto-fit, minmax(280px, 1fr));
-
     gap: 20px;
-
 }
-
-
-/* ==========================================
-   PRODUCT CARD
-   ========================================== */
 
 .product {
-
     background: white;
-
     padding: 20px;
-
     border-radius: 10px;
-
     box-shadow:
         0 2px 8px rgba(0,0,0,0.12);
-
 }
-
 
 .product h2 {
-
     margin-top: 0;
-
     font-size: 21px;
-
     margin-bottom: 12px;
-
 }
-
-
-/* ==========================================
-   REGION
-   ========================================== */
 
 .region {
-
     font-weight: bold;
-
     margin-bottom: 8px;
-
 }
-
-
-/* ==========================================
-   COORDINATES
-   ========================================== */
 
 .coordinates {
-
     margin-bottom: 18px;
-
 }
-
-
-/* ==========================================
-   TELEPORT BUTTON
-   ========================================== */
 
 .teleport {
-
     display: inline-block;
-
     background: #4b6f44;
-
     color: white;
-
     padding: 11px 18px;
-
     border-radius: 6px;
-
     text-decoration: none;
-
     font-weight: bold;
-
 }
-
 
 .teleport:hover {
-
     opacity: 0.85;
-
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.pagination button {
+    padding: 9px 13px;
+    border: 1px solid #aaa;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background: #eee;
+}
+
+.pagination button.active {
+    font-weight: bold;
+    background: #ddd;
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
 
 </style>
 
@@ -207,22 +150,42 @@ TMG PRODUCT CATALOGUE
 
 
 <input
-    type="text"
-    id="search"
-    class="search-box"
-    placeholder="Search products..."
+type="text"
+id="search"
+class="search-box"
+placeholder="Search products..."
 >
 
 
-<div id="status">
+<div class="sort-box">
 
-Loading products...
+<select id="sort">
+
+<option value="az">
+A–Z
+</option>
+
+<option value="za">
+Z–A
+</option>
+
+</select>
 
 </div>
 
 
-<div id="products">
+<div id="status">
+Loading products...
+</div>
 
+
+<div id="products">
+</div>
+
+
+<div
+id="pagination"
+class="pagination">
 </div>
 
 
@@ -237,41 +200,21 @@ Loading products...
 TMG PRODUCT CATALOGUE
 ==================================================
 
-GOOGLE SHEET STRUCTURE
+GOOGLE SHEET
 
-COLUMN A = PRODUCT
-COLUMN B = REGION
-COLUMN C = X
-COLUMN D = Y
-COLUMN E = Z
-
-Example:
-
-Amsterdam in Bloom [adult]
-EDEN PHOENIX
-129
-95
-701
+A = PRODUCT
+B = REGION
+C = X
+D = Y
+E = Z
 
 ==================================================
 */
 
-
-/*
-==================================================
-GOOGLE SHEET ID
-==================================================
-*/
 
 const SHEET_ID =
 "1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
 
-
-/*
-==================================================
-GOOGLE SHEET DATA URL
-==================================================
-*/
 
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/" +
@@ -280,12 +223,17 @@ SHEET_ID +
 
 
 /*
-==================================================
-PRODUCT STORAGE
-==================================================
+PRODUCTS PER PAGE
 */
 
+const PRODUCTS_PER_PAGE = 25;
+
+
 let products = [];
+
+let filteredProducts = [];
+
+let currentPage = 1;
 
 
 /*
@@ -302,16 +250,8 @@ fetch(SHEET_URL)
 
 })
 
-
 .then(function(text) {
 
-
-    /*
-    Google returns JSON wrapped in
-    extra characters.
-
-    Remove the wrapper.
-    */
 
     const json =
         JSON.parse(
@@ -322,11 +262,6 @@ fetch(SHEET_URL)
     const rows =
         json.table.rows;
 
-
-    /*
-    Convert spreadsheet rows
-    into product objects.
-    */
 
     products =
         rows.map(function(row) {
@@ -339,41 +274,21 @@ fetch(SHEET_URL)
             return {
 
 
-                /*
-                COLUMN A
-                */
-
                 product:
                     cells[0]?.v || "",
 
-
-                /*
-                COLUMN B
-                */
 
                 region:
                     cells[1]?.v || "",
 
 
-                /*
-                COLUMN C
-                */
-
                 x:
                     cells[2]?.v || "",
 
 
-                /*
-                COLUMN D
-                */
-
                 y:
                     cells[3]?.v || "",
 
-
-                /*
-                COLUMN E
-                */
 
                 z:
                     cells[4]?.v || ""
@@ -386,7 +301,7 @@ fetch(SHEET_URL)
 
 
     /*
-    Remove completely empty rows.
+    Remove blank rows.
     */
 
     products =
@@ -397,12 +312,11 @@ fetch(SHEET_URL)
         });
 
 
-    /*
-    Display products.
-    */
+    filteredProducts =
+        products.slice();
 
-    displayProducts(products);
 
+    sortProducts();
 
 })
 
@@ -416,17 +330,96 @@ fetch(SHEET_URL)
 
     console.error(error);
 
-
 });
 
 
 /*
 ==================================================
-DISPLAY PRODUCTS
+SORT PRODUCTS
 ==================================================
 */
 
-function displayProducts(list) {
+function sortProducts() {
+
+
+    const sort =
+        document
+        .getElementById("sort")
+        .value;
+
+
+    filteredProducts.sort(function(a, b) {
+
+
+        const nameA =
+            a.product.toLowerCase();
+
+
+        const nameB =
+            b.product.toLowerCase();
+
+
+        if (sort === "az") {
+
+            return nameA.localeCompare(nameB);
+
+        }
+
+
+        return nameB.localeCompare(nameA);
+
+    });
+
+
+    currentPage = 1;
+
+
+    displayPage();
+
+}
+
+
+/*
+==================================================
+FILTER PRODUCTS
+==================================================
+*/
+
+function filterProducts() {
+
+
+    const search =
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    filteredProducts =
+        products.filter(function(product) {
+
+
+            return product.product
+                .toLowerCase()
+                .includes(search);
+
+
+        });
+
+
+    sortProducts();
+
+}
+
+
+/*
+==================================================
+DISPLAY CURRENT PAGE
+==================================================
+*/
+
+function displayPage() {
 
 
     const container =
@@ -437,56 +430,79 @@ function displayProducts(list) {
         document.getElementById("status");
 
 
-    /*
-    Clear previous results.
-    */
-
     container.innerHTML = "";
 
 
+    const total =
+        filteredProducts.length;
+
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                total /
+                PRODUCTS_PER_PAGE
+            )
+        );
+
+
+    if (currentPage > totalPages) {
+
+        currentPage =
+            totalPages;
+
+    }
+
+
+    const start =
+        (currentPage - 1) *
+        PRODUCTS_PER_PAGE;
+
+
+    const end =
+        Math.min(
+            start +
+            PRODUCTS_PER_PAGE,
+            total
+        );
+
+
+    const pageProducts =
+        filteredProducts.slice(
+            start,
+            end
+        );
+
+
+    if (total === 0) {
+
+
+        status.textContent =
+            "No products found.";
+
+
+    } else {
+
+
+        status.textContent =
+            "Showing " +
+            (start + 1) +
+            "–" +
+            end +
+            " of " +
+            total +
+            " products";
+
+
+    }
+
+
     /*
-    Show result count.
+    CREATE PRODUCT CARDS
     */
 
-    status.textContent =
-        list.length +
-        " product" +
-        (list.length === 1 ? "" : "s") +
-        " found";
-
-
-    /*
-    Create each product card.
-    */
-
-    list.forEach(function(product) {
-
-
-        /*
-        ==========================================
-        BUILD SECOND LIFE SLURL
-        ==========================================
-
-        Example:
-
-        Region:
-        EDEN PHOENIX
-
-        X:
-        129
-
-        Y:
-        95
-
-        Z:
-        701
-
-
-        Result:
-
-        http://maps.secondlife.com/secondlife/
-        EDEN%20PHOENIX/129/95/701
-        */
+    pageProducts.forEach(function(product) {
 
 
         const region =
@@ -507,6 +523,10 @@ function displayProducts(list) {
             String(product.z).trim();
 
 
+        /*
+        SECOND LIFE TELEPORT LINK
+        */
+
         const slurl =
             "http://maps.secondlife.com/secondlife/" +
             region +
@@ -518,10 +538,6 @@ function displayProducts(list) {
             z;
 
 
-        /*
-        Create product card.
-        */
-
         const card =
             document.createElement("div");
 
@@ -530,10 +546,6 @@ function displayProducts(list) {
             "product";
 
 
-        /*
-        Add product information.
-        */
-
         card.innerHTML = `
 
             <h2>
@@ -541,41 +553,26 @@ function displayProducts(list) {
             </h2>
 
             <div class="region">
-
                 ${escapeHTML(product.region)}
-
             </div>
 
             <div class="coordinates">
-
                 ${escapeHTML(product.x)},
                 ${escapeHTML(product.y)},
                 ${escapeHTML(product.z)}
-
             </div>
 
             <a
-
                 class="teleport"
-
                 href="${slurl}"
-
                 target="_blank"
-
                 rel="noopener"
-
             >
-
                 TELEPORT
-
             </a>
 
         `;
 
-
-        /*
-        Add card to page.
-        */
 
         container.appendChild(card);
 
@@ -583,47 +580,151 @@ function displayProducts(list) {
     });
 
 
+    createPagination(totalPages);
+
 }
 
 
 /*
 ==================================================
-SEARCH PRODUCTS
+PAGINATION
 ==================================================
 */
 
-function searchProducts() {
+function createPagination(totalPages) {
 
 
-    const search =
-        document
-        .getElementById("search")
-        .value
-        .toLowerCase()
-        .trim();
+    const container =
+        document.getElementById(
+            "pagination"
+        );
 
 
-    /*
-    Filter products by product name.
-    */
-
-    const filtered =
-        products.filter(function(product) {
+    container.innerHTML = "";
 
 
-            return product.product
-                .toLowerCase()
-                .includes(search);
+    if (totalPages <= 1) {
 
+        return;
 
-        });
+    }
 
 
     /*
-    Display matching products.
+    PREVIOUS
     */
 
-    displayProducts(filtered);
+    const previous =
+        document.createElement("button");
+
+
+    previous.textContent =
+        "← Previous";
+
+
+    previous.disabled =
+        currentPage === 1;
+
+
+    previous.onclick =
+        function() {
+
+            currentPage--;
+
+            displayPage();
+
+            window.scrollTo(
+                0,
+                0
+            );
+
+        };
+
+
+    container.appendChild(previous);
+
+
+    /*
+    PAGE NUMBERS
+    */
+
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+
+        const button =
+            document.createElement("button");
+
+
+        button.textContent =
+            page;
+
+
+        if (page === currentPage) {
+
+            button.className =
+                "active";
+
+        }
+
+
+        button.onclick =
+            function() {
+
+                currentPage =
+                    page;
+
+                displayPage();
+
+                window.scrollTo(
+                    0,
+                    0
+                );
+
+            };
+
+
+        container.appendChild(button);
+
+
+    }
+
+
+    /*
+    NEXT
+    */
+
+    const next =
+        document.createElement("button");
+
+
+    next.textContent =
+        "Next →";
+
+
+    next.disabled =
+        currentPage === totalPages;
+
+
+    next.onclick =
+        function() {
+
+            currentPage++;
+
+            displayPage();
+
+            window.scrollTo(
+                0,
+                0
+            );
+
+        };
+
+
+    container.appendChild(next);
 
 
 }
@@ -631,13 +732,7 @@ function searchProducts() {
 
 /*
 ==================================================
-SAFE HTML TEXT
-==================================================
-
-Prevents product names containing
-special characters from breaking
-the webpage.
-
+SAFE HTML
 ==================================================
 */
 
@@ -662,7 +757,7 @@ function escapeHTML(text) {
 
 /*
 ==================================================
-SEARCH BOX EVENT
+EVENTS
 ==================================================
 */
 
@@ -671,11 +766,18 @@ document
 .getElementById("search")
 
 .addEventListener(
-
     "input",
+    filterProducts
+);
 
-    searchProducts
 
+document
+
+.getElementById("sort")
+
+.addEventListener(
+    "change",
+    sortProducts
 );
 
 
