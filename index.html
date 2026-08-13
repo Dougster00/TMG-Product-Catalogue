@@ -1,96 +1,210 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>TMG Product Catalogue</title>
 
+
 <style>
 
+/* ==========================================
+   PAGE
+   ========================================== */
+
 body {
+
     font-family: Arial, sans-serif;
+
     background: #f4f1ea;
+
     margin: 0;
+
     padding: 30px;
+
     color: #333;
+
 }
+
 
 .container {
+
     max-width: 1100px;
+
     margin: auto;
+
 }
+
+
+/* ==========================================
+   TITLE
+   ========================================== */
 
 h1 {
+
     text-align: center;
+
     margin-bottom: 25px;
+
 }
+
+
+/* ==========================================
+   SEARCH
+   ========================================== */
 
 .search-box {
+
     width: 100%;
+
     box-sizing: border-box;
+
     padding: 14px;
+
     font-size: 18px;
+
     border: 1px solid #bbb;
+
     border-radius: 8px;
-    margin-bottom: 25px;
+
+    margin-bottom: 20px;
+
 }
+
+
+/* ==========================================
+   STATUS
+   ========================================== */
 
 #status {
+
     text-align: center;
+
     margin-bottom: 20px;
+
 }
+
+
+/* ==========================================
+   PRODUCTS
+   ========================================== */
 
 #products {
+
     display: grid;
+
     grid-template-columns:
         repeat(auto-fit, minmax(280px, 1fr));
+
     gap: 20px;
+
 }
+
+
+/* ==========================================
+   PRODUCT CARD
+   ========================================== */
 
 .product {
+
     background: white;
+
     padding: 20px;
+
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.12);
+
 }
+
 
 .product h2 {
+
     margin-top: 0;
+
     font-size: 21px;
+
+    margin-bottom: 12px;
+
 }
+
+
+/* ==========================================
+   REGION
+   ========================================== */
 
 .region {
+
     font-weight: bold;
+
     margin-bottom: 8px;
+
 }
+
+
+/* ==========================================
+   COORDINATES
+   ========================================== */
 
 .coordinates {
+
     margin-bottom: 18px;
+
 }
+
+
+/* ==========================================
+   TELEPORT BUTTON
+   ========================================== */
 
 .teleport {
+
     display: inline-block;
+
     background: #4b6f44;
+
     color: white;
+
     padding: 11px 18px;
+
     border-radius: 6px;
+
     text-decoration: none;
+
     font-weight: bold;
+
 }
+
 
 .teleport:hover {
+
     opacity: 0.85;
+
 }
 
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
-<h1>TMG PRODUCT CATALOGUE</h1>
+
+<h1>
+TMG PRODUCT CATALOGUE
+</h1>
+
 
 <input
     type="text"
@@ -99,34 +213,65 @@ h1 {
     placeholder="Search products..."
 >
 
+
 <div id="status">
-    Loading products...
+
+Loading products...
+
 </div>
 
-<div id="products"></div>
+
+<div id="products">
+
+</div>
+
 
 </div>
 
 
 <script>
 
+
 /*
 ==================================================
 TMG PRODUCT CATALOGUE
-Google Sheet columns:
+==================================================
 
-A = PRODUCT
-B = REGION
-C = X
-D = Y
-E = Z
+GOOGLE SHEET STRUCTURE
+
+COLUMN A = PRODUCT
+COLUMN B = REGION
+COLUMN C = X
+COLUMN D = Y
+COLUMN E = Z
+
+Example:
+
+Amsterdam in Bloom [adult]
+EDEN PHOENIX
+129
+95
+701
+
 ==================================================
 */
 
 
+/*
+==================================================
+GOOGLE SHEET ID
+==================================================
+*/
+
 const SHEET_ID =
 "1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
 
+
+/*
+==================================================
+GOOGLE SHEET DATA URL
+==================================================
+*/
 
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/" +
@@ -134,18 +279,39 @@ SHEET_ID +
 "/gviz/tq?tqx=out:json";
 
 
+/*
+==================================================
+PRODUCT STORAGE
+==================================================
+*/
+
 let products = [];
 
 
 /*
+==================================================
 LOAD GOOGLE SHEET
+==================================================
 */
 
 fetch(SHEET_URL)
 
-.then(response => response.text())
+.then(function(response) {
 
-.then(text => {
+    return response.text();
+
+})
+
+
+.then(function(text) {
+
+
+    /*
+    Google returns JSON wrapped in
+    extra characters.
+
+    Remove the wrapper.
+    */
 
     const json =
         JSON.parse(
@@ -157,64 +323,130 @@ fetch(SHEET_URL)
         json.table.rows;
 
 
-    products =
-        rows.map(row => {
+    /*
+    Convert spreadsheet rows
+    into product objects.
+    */
 
-            const cells = row.c;
+    products =
+        rows.map(function(row) {
+
+
+            const cells =
+                row.c;
 
 
             return {
 
+
+                /*
+                COLUMN A
+                */
+
                 product:
                     cells[0]?.v || "",
+
+
+                /*
+                COLUMN B
+                */
 
                 region:
                     cells[1]?.v || "",
 
+
+                /*
+                COLUMN C
+                */
+
                 x:
                     cells[2]?.v || "",
+
+
+                /*
+                COLUMN D
+                */
 
                 y:
                     cells[3]?.v || "",
 
+
+                /*
+                COLUMN E
+                */
+
                 z:
                     cells[4]?.v || ""
 
+
             };
+
 
         });
 
 
+    /*
+    Remove completely empty rows.
+    */
+
+    products =
+        products.filter(function(product) {
+
+            return product.product.trim() !== "";
+
+        });
+
+
+    /*
+    Display products.
+    */
+
     displayProducts(products);
+
 
 })
 
 
-.catch(error => {
+.catch(function(error) {
+
 
     document.getElementById("status").textContent =
         "Unable to load products.";
 
+
     console.error(error);
+
 
 });
 
 
 /*
+==================================================
 DISPLAY PRODUCTS
+==================================================
 */
 
 function displayProducts(list) {
 
+
     const container =
         document.getElementById("products");
+
 
     const status =
         document.getElementById("status");
 
 
+    /*
+    Clear previous results.
+    */
+
     container.innerHTML = "";
 
+
+    /*
+    Show result count.
+    */
 
     status.textContent =
         list.length +
@@ -223,22 +455,36 @@ function displayProducts(list) {
         " found";
 
 
-    list.forEach(product => {
+    /*
+    Create each product card.
+    */
+
+    list.forEach(function(product) {
 
 
         /*
+        ==========================================
         BUILD SECOND LIFE SLURL
+        ==========================================
 
         Example:
 
+        Region:
         EDEN PHOENIX
+
+        X:
         129
+
+        Y:
         95
+
+        Z:
         701
 
-        becomes:
 
-        https://maps.secondlife.com/secondlife/
+        Result:
+
+        http://maps.secondlife.com/secondlife/
         EDEN%20PHOENIX/129/95/701
         */
 
@@ -249,16 +495,32 @@ function displayProducts(list) {
             .replace(/ /g, "%20");
 
 
-        const slurl =
-            "https://maps.secondlife.com/secondlife/" +
-            region +
-            "/" +
-            String(product.x).trim() +
-            "/" +
-            String(product.y).trim() +
-            "/" +
+        const x =
+            String(product.x).trim();
+
+
+        const y =
+            String(product.y).trim();
+
+
+        const z =
             String(product.z).trim();
 
+
+        const slurl =
+            "http://maps.secondlife.com/secondlife/" +
+            region +
+            "/" +
+            x +
+            "/" +
+            y +
+            "/" +
+            z;
+
+
+        /*
+        Create product card.
+        */
 
         const card =
             document.createElement("div");
@@ -268,6 +530,10 @@ function displayProducts(list) {
             "product";
 
 
+        /*
+        Add product information.
+        */
+
         card.innerHTML = `
 
             <h2>
@@ -275,39 +541,59 @@ function displayProducts(list) {
             </h2>
 
             <div class="region">
+
                 ${escapeHTML(product.region)}
+
             </div>
 
             <div class="coordinates">
+
                 ${escapeHTML(product.x)},
                 ${escapeHTML(product.y)},
                 ${escapeHTML(product.z)}
+
             </div>
 
             <a
+
                 class="teleport"
+
                 href="${slurl}"
+
                 target="_blank"
+
                 rel="noopener"
+
             >
+
                 TELEPORT
+
             </a>
 
         `;
 
 
+        /*
+        Add card to page.
+        */
+
         container.appendChild(card);
 
+
     });
+
 
 }
 
 
 /*
-SEARCH
+==================================================
+SEARCH PRODUCTS
+==================================================
 */
 
 function searchProducts() {
+
 
     const search =
         document
@@ -317,26 +603,46 @@ function searchProducts() {
         .trim();
 
 
+    /*
+    Filter products by product name.
+    */
+
     const filtered =
-        products.filter(product => {
+        products.filter(function(product) {
+
 
             return product.product
                 .toLowerCase()
                 .includes(search);
 
+
         });
 
 
+    /*
+    Display matching products.
+    */
+
     displayProducts(filtered);
+
 
 }
 
 
 /*
-SAFE TEXT DISPLAY
+==================================================
+SAFE HTML TEXT
+==================================================
+
+Prevents product names containing
+special characters from breaking
+the webpage.
+
+==================================================
 */
 
 function escapeHTML(text) {
+
 
     return String(text)
 
@@ -350,21 +656,33 @@ function escapeHTML(text) {
 
         .replace(/'/g, "&#039;");
 
+
 }
 
 
 /*
-SEARCH BOX
+==================================================
+SEARCH BOX EVENT
+==================================================
 */
 
 document
+
 .getElementById("search")
+
 .addEventListener(
+
     "input",
+
     searchProducts
+
 );
+
 
 </script>
 
+
 </body>
+
 </html>
+```
