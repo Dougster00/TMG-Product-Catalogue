@@ -1,13 +1,11 @@
-```html
-<!DOCTYPE html>
+{`<!DOCTYPE html>
 <html lang="en">
 
 <head>
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>TMG Product Catalogue</title>
 
@@ -58,44 +56,45 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* COMPACT PRODUCT GRID */
+
 #products {
     display: grid;
-    grid-template-columns:
-        repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
 }
 
 .product {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow:
-        0 2px 8px rgba(0,0,0,0.12);
+    padding: 14px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 .product h2 {
     margin-top: 0;
-    font-size: 21px;
-    margin-bottom: 12px;
+    font-size: 17px;
+    margin-bottom: 8px;
 }
 
 .region {
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .coordinates {
-    margin-bottom: 18px;
+    margin-bottom: 10px;
 }
 
 .teleport {
     display: inline-block;
     background: #4b6f44;
     color: white;
-    padding: 11px 18px;
-    border-radius: 6px;
+    padding: 8px 12px;
+    border-radius: 5px;
     text-decoration: none;
     font-weight: bold;
+    font-size: 14px;
 }
 
 .teleport:hover {
@@ -137,17 +136,11 @@ h1 {
 
 </head>
 
-
 <body>
-
 
 <div class="container">
 
-
-<h1>
-TMG PRODUCT CATALOGUE
-</h1>
-
+<h1>TMG PRODUCT CATALOGUE</h1>
 
 <input
 type="text"
@@ -156,334 +149,178 @@ class="search-box"
 placeholder="Search products..."
 >
 
-
 <div class="sort-box">
 
 <select id="sort">
 
-<option value="az">
-A–Z
-</option>
+<option value="az">A–Z</option>
 
-<option value="za">
-Z–A
-</option>
+<option value="za">Z–A</option>
 
 </select>
 
 </div>
 
+<div id="status">Loading products...</div>
 
-<div id="status">
-Loading products...
-</div>
+<div id="products"></div>
 
-
-<div id="products">
-</div>
-
-
-<div
-id="pagination"
-class="pagination">
-</div>
-
+<div id="pagination" class="pagination"></div>
 
 </div>
-
 
 <script>
 
-
-/*
-==================================================
-TMG PRODUCT CATALOGUE
-==================================================
-
-GOOGLE SHEET
-
-A = PRODUCT
-B = REGION
-C = X
-D = Y
-E = Z
-
-==================================================
-*/
-
-
 const SHEET_ID =
 "1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
-
 
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/" +
 SHEET_ID +
 "/gviz/tq?tqx=out:json";
 
-
-/*
-PRODUCTS PER PAGE
-*/
+/* 100 PRODUCTS PER PAGE */
 
 const PRODUCTS_PER_PAGE = 100;
 
-
 let products = [];
-
 let filteredProducts = [];
-
 let currentPage = 1;
-
-
-/*
-==================================================
-LOAD GOOGLE SHEET
-==================================================
-*/
 
 fetch(SHEET_URL)
 
 .then(function(response) {
-
     return response.text();
-
 })
 
 .then(function(text) {
-
 
     const json =
         JSON.parse(
             text.substring(47).slice(0, -2)
         );
 
-
-    const rows =
-        json.table.rows;
-
+    const rows = json.table.rows;
 
     products =
         rows.map(function(row) {
 
-
-            const cells =
-                row.c;
-
+            const cells = row.c;
 
             return {
-
-
-                product:
-                    cells[0]?.v || "",
-
-
-                region:
-                    cells[1]?.v || "",
-
-
-                x:
-                    cells[2]?.v || "",
-
-
-                y:
-                    cells[3]?.v || "",
-
-
-                z:
-                    cells[4]?.v || ""
-
-
+                product: cells[0]?.v || "",
+                region: cells[1]?.v || "",
+                x: cells[2]?.v || "",
+                y: cells[3]?.v || "",
+                z: cells[4]?.v || ""
             };
 
-
         });
-
-
-    /*
-    Remove blank rows.
-    */
 
     products =
         products.filter(function(product) {
-
             return product.product.trim() !== "";
-
         });
 
-
-    filteredProducts =
-        products.slice();
-
+    filteredProducts = products.slice();
 
     sortProducts();
 
 })
 
-
 .catch(function(error) {
-
 
     document.getElementById("status").textContent =
         "Unable to load products.";
-
 
     console.error(error);
 
 });
 
-
-/*
-==================================================
-SORT PRODUCTS
-==================================================
-*/
-
 function sortProducts() {
 
-
     const sort =
-        document
-        .getElementById("sort")
-        .value;
-
+        document.getElementById("sort").value;
 
     filteredProducts.sort(function(a, b) {
 
-
-        const nameA =
-            a.product.toLowerCase();
-
-
-        const nameB =
-            b.product.toLowerCase();
-
+        const nameA = a.product.toLowerCase();
+        const nameB = b.product.toLowerCase();
 
         if (sort === "az") {
-
             return nameA.localeCompare(nameB);
-
         }
-
 
         return nameB.localeCompare(nameA);
 
     });
 
-
     currentPage = 1;
-
 
     displayPage();
 
 }
 
-
-/*
-==================================================
-FILTER PRODUCTS
-==================================================
-*/
-
 function filterProducts() {
 
-
     const search =
-        document
-        .getElementById("search")
+        document.getElementById("search")
         .value
         .toLowerCase()
         .trim();
 
-
     filteredProducts =
         products.filter(function(product) {
-
 
             return product.product
                 .toLowerCase()
                 .includes(search);
 
-
         });
-
 
     sortProducts();
 
 }
 
-
-/*
-==================================================
-DISPLAY CURRENT PAGE
-==================================================
-*/
-
 function displayPage() {
-
 
     const container =
         document.getElementById("products");
 
-
     const status =
         document.getElementById("status");
 
-
     container.innerHTML = "";
 
-
-    const total =
-        filteredProducts.length;
-
+    const total = filteredProducts.length;
 
     const totalPages =
         Math.max(
             1,
-            Math.ceil(
-                total /
-                PRODUCTS_PER_PAGE
-            )
+            Math.ceil(total / PRODUCTS_PER_PAGE)
         );
 
-
     if (currentPage > totalPages) {
-
-        currentPage =
-            totalPages;
-
+        currentPage = totalPages;
     }
 
-
     const start =
-        (currentPage - 1) *
-        PRODUCTS_PER_PAGE;
-
+        (currentPage - 1) * PRODUCTS_PER_PAGE;
 
     const end =
         Math.min(
-            start +
-            PRODUCTS_PER_PAGE,
+            start + PRODUCTS_PER_PAGE,
             total
         );
 
-
     const pageProducts =
-        filteredProducts.slice(
-            start,
-            end
-        );
-
+        filteredProducts.slice(start, end);
 
     if (total === 0) {
 
-
-        status.textContent =
-            "No products found.";
-
+        status.textContent = "No products found.";
 
     } else {
-
 
         status.textContent =
             "Showing " +
@@ -494,38 +331,18 @@ function displayPage() {
             total +
             " products";
 
-
     }
 
-
-    /*
-    CREATE PRODUCT CARDS
-    */
-
     pageProducts.forEach(function(product) {
-
 
         const region =
             String(product.region)
             .trim()
             .replace(/ /g, "%20");
 
-
-        const x =
-            String(product.x).trim();
-
-
-        const y =
-            String(product.y).trim();
-
-
-        const z =
-            String(product.z).trim();
-
-
-        /*
-        SECOND LIFE TELEPORT LINK
-        */
+        const x = String(product.x).trim();
+        const y = String(product.y).trim();
+        const z = String(product.z).trim();
 
         const slurl =
             "http://maps.secondlife.com/secondlife/" +
@@ -537,116 +354,71 @@ function displayPage() {
             "/" +
             z;
 
-
         const card =
             document.createElement("div");
 
+        card.className = "product";
 
-        card.className =
-            "product";
-
-
-        card.innerHTML = `
-
-            <h2>
-                ${escapeHTML(product.product)}
-            </h2>
+        card.innerHTML = \`
+            <h2>\${escapeHTML(product.product)}</h2>
 
             <div class="region">
-                ${escapeHTML(product.region)}
+                \${escapeHTML(product.region)}
             </div>
 
             <div class="coordinates">
-                ${escapeHTML(product.x)},
-                ${escapeHTML(product.y)},
-                ${escapeHTML(product.z)}
+                \${escapeHTML(product.x)},
+                \${escapeHTML(product.y)},
+                \${escapeHTML(product.z)}
             </div>
 
             <a
                 class="teleport"
-                href="${slurl}"
+                href="\${slurl}"
                 target="_blank"
                 rel="noopener"
             >
                 TELEPORT
             </a>
-
-        `;
-
+        \`;
 
         container.appendChild(card);
 
-
     });
-
 
     createPagination(totalPages);
 
 }
 
-
-/*
-==================================================
-PAGINATION
-==================================================
-*/
-
 function createPagination(totalPages) {
 
-
     const container =
-        document.getElementById(
-            "pagination"
-        );
-
+        document.getElementById("pagination");
 
     container.innerHTML = "";
 
-
     if (totalPages <= 1) {
-
         return;
-
     }
-
-
-    /*
-    PREVIOUS
-    */
 
     const previous =
         document.createElement("button");
 
+    previous.textContent = "← Previous";
 
-    previous.textContent =
-        "← Previous";
+    previous.disabled = currentPage === 1;
 
+    previous.onclick = function() {
 
-    previous.disabled =
-        currentPage === 1;
+        currentPage--;
 
+        displayPage();
 
-    previous.onclick =
-        function() {
+        window.scrollTo(0, 0);
 
-            currentPage--;
-
-            displayPage();
-
-            window.scrollTo(
-                0,
-                0
-            );
-
-        };
-
+    };
 
     container.appendChild(previous);
-
-
-    /*
-    PAGE NUMBERS
-    */
 
     for (
         let page = 1;
@@ -654,137 +426,72 @@ function createPagination(totalPages) {
         page++
     ) {
 
-
         const button =
             document.createElement("button");
 
-
-        button.textContent =
-            page;
-
+        button.textContent = page;
 
         if (page === currentPage) {
-
-            button.className =
-                "active";
-
+            button.className = "active";
         }
 
+        button.onclick = function() {
 
-        button.onclick =
-            function() {
+            currentPage = page;
 
-                currentPage =
-                    page;
+            displayPage();
 
-                displayPage();
+            window.scrollTo(0, 0);
 
-                window.scrollTo(
-                    0,
-                    0
-                );
-
-            };
-
+        };
 
         container.appendChild(button);
 
-
     }
-
-
-    /*
-    NEXT
-    */
 
     const next =
         document.createElement("button");
 
-
-    next.textContent =
-        "Next →";
-
+    next.textContent = "Next →";
 
     next.disabled =
         currentPage === totalPages;
 
+    next.onclick = function() {
 
-    next.onclick =
-        function() {
+        currentPage++;
 
-            currentPage++;
+        displayPage();
 
-            displayPage();
+        window.scrollTo(0, 0);
 
-            window.scrollTo(
-                0,
-                0
-            );
-
-        };
-
+    };
 
     container.appendChild(next);
 
-
 }
-
-
-/*
-==================================================
-SAFE HTML
-==================================================
-*/
 
 function escapeHTML(text) {
 
-
     return String(text)
-
         .replace(/&/g, "&amp;")
-
         .replace(/</g, "&lt;")
-
         .replace(/>/g, "&gt;")
-
         .replace(/"/g, "&quot;")
-
         .replace(/'/g, "&#039;");
-
 
 }
 
-
-/*
-==================================================
-EVENTS
-==================================================
-*/
-
 document
-
 .getElementById("search")
-
-.addEventListener(
-    "input",
-    filterProducts
-);
-
+.addEventListener("input", filterProducts);
 
 document
-
 .getElementById("sort")
-
-.addEventListener(
-    "change",
-    sortProducts
-);
-
+.addEventListener("change", sortProducts);
 
 </script>
 
-
 </body>
 
-</html>
-```
+</html>`}
