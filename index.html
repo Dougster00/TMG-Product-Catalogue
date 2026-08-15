@@ -1,4 +1,782 @@
-{`<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TMG Product Catalogue</title>
+
+<style>
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f1ea;
+    margin: 0;
+    padding: 30px;
+    color: #333;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.search-box {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    font-size: 18px;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.sort-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.sort-box select {
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+}
+
+#status {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+/* ==========================================
+   PRODUCT GRID
+   5 PRODUCTS ACROSS ON DESKTOP
+   ========================================== */
+
+#products {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+
+/* ==========================================
+   PRODUCT BOX
+   ========================================== */
+
+.product {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    box-sizing: border-box;
+}
+
+.product h2 {
+    margin-top: 0;
+    font-size: 16px;
+    line-height: 1.25;
+    margin-bottom: 8px;
+}
+
+.region {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.coordinates {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+
+/* ==========================================
+   TELEPORT BUTTON
+   ========================================== */
+
+.teleport {
+    display: inline-block;
+    background: #4b6f44;
+    color: white;
+    padding: 7px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.teleport:hover {
+    opacity: 0.85;
+}
+
+
+/* ==========================================
+   PAGINATION
+   ========================================== */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.pagination button {
+    padding: 9px 13px;
+    border: 1px solid #aaa;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background: #eee;
+}
+
+.pagination button.active {
+    font-weight: bold;
+    background: #ddd;
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+
+/* ==========================================
+   RESPONSIVE LAYOUT
+   ========================================== */
+
+@media (max-width: 1000px) {
+
+    #products {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    body {
+        padding: 15px;
+    }
+
+    #products {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    #products {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<h1>TMG PRODUCT CATALOGUE</h1>
+
+
+<input
+    type="text"
+    id="search"
+    class="search-box"
+    placeholder="Search products..."
+>
+
+
+<div class="sort-box">
+
+    <select id="sort">
+
+        <option value="az">A–Z</option>
+
+        <option value="za">Z–A</option>
+
+    </select>
+
+</div>
+
+
+<div id="status">
+    Loading products...
+</div>
+
+
+<div id="products"></div>
+
+
+<div id="pagination" class="pagination"></div>
+
+
+</div>
+
+
+<script>
+
+
+/* ==========================================
+   GOOGLE SHEETS
+   ========================================== */
+
+const SHEET_ID =
+"1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
+
+const SHEET_URL =
+"https://docs.google.com/spreadsheets/d/" +
+SHEET_ID +
+"/gviz/tq?tqx=out:json";
+
+
+/* ==========================================
+   SETTINGS
+   ========================================== */
+
+const PRODUCTS_PER_PAGE = 100;
+
+
+/* ==========================================
+   VARIABLES
+   ========================================== */
+
+let products = [];
+
+let filteredProducts = [];
+
+let currentPage = 1;
+
+
+/* ==========================================
+   LOAD PRODUCTS
+   ========================================== */
+
+fetch(SHEET_URL)
+
+.then(function(response) {
+
+    return response.text();
+
+})
+
+.then(function(text) {
+
+    const json =
+        JSON.parse(
+            text.substring(47).slice(0, -2)
+        );
+
+
+    const rows = json.table.rows;
+
+
+    products =
+        rows.map(function(row) {
+
+            const cells = row.c;
+
+
+            return {
+
+                product: cells[0]?.v || "",
+
+                region: cells[1]?.v || "",
+
+                x: cells[2]?.v || "",
+
+                y: cells[3]?.v || "",
+
+                z: cells[4]?.v || ""
+
+            };
+
+        });
+
+
+    /* Remove blank product rows */
+
+    products =
+        products.filter(function(product) {
+
+            return product.product.trim() !== "";
+
+        });
+
+
+    filteredProducts =
+        products.slice();
+
+
+    sortProducts();
+
+})
+
+
+.catch(function(error) {
+
+    document.getElementById("status").textContent =
+        "Unable to load products.";
+
+    console.error(error);
+
+});
+
+
+/* ==========================================
+   SORT PRODUCTS
+   ========================================== */
+
+function sortProducts() {
+
+
+    const sort =
+        document.getElementById("sort").value;
+
+
+    filteredProducts.sort(function(a, b) {
+
+
+        const nameA =
+            a.product.toLowerCase();
+
+
+        const nameB =
+            b.product.toLowerCase();
+
+
+        if (sort === "az") {
+
+            return nameA.localeCompare(nameB);
+
+        }
+
+
+        return nameB.localeCompare(nameA);
+
+    });
+
+
+    currentPage = 1;
+
+
+    displayPage();
+
+}
+
+
+/* ==========================================
+   SEARCH / FILTER
+   ========================================== */
+
+function filterProducts() {
+
+
+    const search =
+        document.getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    filteredProducts =
+        products.filter(function(product) {
+
+
+            return product.product
+                .toLowerCase()
+                .includes(search);
+
+
+        });
+
+
+    sortProducts();
+
+}
+
+
+/* ==========================================
+   DISPLAY CURRENT PAGE
+   ========================================== */
+
+function displayPage() {
+
+
+    const container =
+        document.getElementById("products");
+
+
+    const status =
+        document.getElementById("status");
+
+
+    container.innerHTML = "";
+
+
+    const total =
+        filteredProducts.length;
+
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                total / PRODUCTS_PER_PAGE
+            )
+        );
+
+
+    if (currentPage > totalPages) {
+
+        currentPage = totalPages;
+
+    }
+
+
+    const start =
+        (currentPage - 1) *
+        PRODUCTS_PER_PAGE;
+
+
+    const end =
+        Math.min(
+            start + PRODUCTS_PER_PAGE,
+            total
+        );
+
+
+    const pageProducts =
+        filteredProducts.slice(
+            start,
+            end
+        );
+
+
+    /* ======================================
+       STATUS
+       ====================================== */
+
+    if (total === 0) {
+
+        status.textContent =
+            "No products found.";
+
+    }
+
+    else {
+
+        status.textContent =
+            "Showing " +
+            (start + 1) +
+            "–" +
+            end +
+            " of " +
+            total +
+            " products";
+
+    }
+
+
+    /* ======================================
+       CREATE PRODUCT BOXES
+       ====================================== */
+
+    pageProducts.forEach(function(product) {
+
+
+        const region =
+            String(product.region)
+            .trim()
+            .replace(/ /g, "%20");
+
+
+        const x =
+            String(product.x).trim();
+
+
+        const y =
+            String(product.y).trim();
+
+
+        const z =
+            String(product.z).trim();
+
+
+        const slurl =
+            "http://maps.secondlife.com/secondlife/" +
+            region +
+            "/" +
+            x +
+            "/" +
+            y +
+            "/" +
+            z;
+
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "product";
+
+
+        card.innerHTML = `
+
+            <h2>
+                ${escapeHTML(product.product)}
+            </h2>
+
+            <div class="region">
+                ${escapeHTML(product.region)}
+            </div>
+
+            <div class="coordinates">
+                ${escapeHTML(product.x)},
+                ${escapeHTML(product.y)},
+                ${escapeHTML(product.z)}
+            </div>
+
+            <a
+                class="teleport"
+                href="${slurl}"
+                target="_blank"
+                rel="noopener"
+            >
+                TELEPORT
+            </a>
+
+        `;
+
+
+        container.appendChild(card);
+
+
+    });
+
+
+    createPagination(totalPages);
+
+}
+
+
+/* ==========================================
+   PAGINATION
+   ========================================== */
+
+function createPagination(totalPages) {
+
+
+    const container =
+        document.getElementById("pagination");
+
+
+    container.innerHTML = "";
+
+
+    if (totalPages <= 1) {
+
+        return;
+
+    }
+
+
+    /* ======================================
+       PREVIOUS BUTTON
+       ====================================== */
+
+    const previous =
+        document.createElement("button");
+
+
+    previous.textContent =
+        "← Previous";
+
+
+    previous.disabled =
+        currentPage === 1;
+
+
+    previous.onclick =
+        function() {
+
+
+            currentPage--;
+
+
+            displayPage();
+
+
+            window.scrollTo(0, 0);
+
+        };
+
+
+    container.appendChild(previous);
+
+
+    /* ======================================
+       PAGE BUTTONS
+       ====================================== */
+
+    for (
+        let page = 1;
+        page <= totalPages;
+        page++
+    ) {
+
+
+        const button =
+            document.createElement("button");
+
+
+        button.textContent =
+            page;
+
+
+        if (page === currentPage) {
+
+            button.className =
+                "active";
+
+        }
+
+
+        button.onclick =
+            function() {
+
+
+                currentPage =
+                    page;
+
+
+                displayPage();
+
+
+                window.scrollTo(0, 0);
+
+            };
+
+
+        container.appendChild(button);
+
+    }
+
+
+    /* ======================================
+       NEXT BUTTON
+       ====================================== */
+
+    const next =
+        document.createElement("button");
+
+
+    next.textContent =
+        "Next →";
+
+
+    next.disabled =
+        currentPage === totalPages;
+
+
+    next.onclick =
+        function() {
+
+
+            currentPage++;
+
+
+            displayPage();
+
+
+            window.scrollTo(0, 0);
+
+        };
+
+
+    container.appendChild(next);
+
+}
+
+
+/* ==========================================
+   HTML SECURITY
+   ========================================== */
+
+function escapeHTML(text) {
+
+
+    return String(text)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ==========================================
+   SEARCH EVENT
+   ========================================== */
+
+document
+    .getElementById("search")
+    .addEventListener(
+        "input",
+        filterProducts
+    );
+
+
+/* ==========================================
+   SORT EVENT
+   ========================================== */
+
+document
+    .getElementById("sort")
+    .addEventListener(
+        "change",
+        sortProducts
+    );
+
+
+</script>
+
+
+</body>
+
+</html>{`<!DOCTYPE html>
 <html lang="en">
 
 <head>
