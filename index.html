@@ -26,22 +26,22 @@ body {
     position: absolute;
     top: 0;
     right: calc(100% + 24px);
-    width: 240px;
+    width: 320px;
     box-sizing: border-box;
-    padding: 24px 20px;
+    padding: 28px 24px;
     background: rgba(8, 22, 16, 0.78);
     border: 1px solid rgba(220, 230, 215, 0.18);
     border-radius: 16px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.38);
     backdrop-filter: blur(3px);
-    min-height: 220px;
+    min-height: 420px;
 }
 
 .featured-panel h2 {
     margin: 0;
     color: #f4ecd0;
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 500;
     letter-spacing: 1px;
     text-align: center;
@@ -222,11 +222,11 @@ h1 {
 .pagination button.active { font-weight: bold; background: #ddd; }
 .pagination button:disabled { opacity: 0.4; cursor: default; }
 
-@media (max-width: 1500px) {
+@media (max-width: 1600px) {
     .featured-panel {
         position: static;
         width: auto;
-        min-height: auto;
+        min-height: 300px;
         margin-bottom: 22px;
     }
 }
@@ -238,7 +238,7 @@ h1 {
 @media (max-width: 650px) {
     body { padding: 15px; }
     .container { padding: 18px; }
-    .featured-panel { padding: 18px; }
+    .featured-panel { padding: 18px; min-height: 260px; }
     .brand-header h1 { letter-spacing: 2px; }
     .brand-subtitle { font-size: 16px; }
     .catalogue-tools { padding: 12px; }
