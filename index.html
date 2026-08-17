@@ -3,475 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TMG Product Catalogue</title>
+<title>Two Moon Gardens Product Catalogue</title>
 <style>
+:root { --gold:#d6ad55; --gold-soft:#f0d28a; --purple:#c89cff; --panel:rgba(3,14,17,.91); --line:rgba(214,173,85,.72); }
+* { box-sizing:border-box; }
 body {
     font-family: Arial, sans-serif;
     background:
-        linear-gradient(rgba(8, 20, 15, 0.58), rgba(8, 20, 15, 0.68)),
+        linear-gradient(rgba(2,8,16,.42),rgba(2,8,16,.56)),
         url("tmg-background.jpg") center center / cover fixed no-repeat;
-    margin: 0;
-    padding: 30px;
-    color: #f4f5ef;
-    min-height: 100vh;
+    margin:0; padding:30px; color:#f4f5ef; min-height:100vh;
 }
-
-.page-layout {
-    max-width: 1100px;
-    margin: auto;
-    position: relative;
+.site-header { text-align:center; margin:0 auto 28px; text-shadow:0 3px 14px #000; }
+.site-header h1 { margin:0; font-family:Georgia,"Times New Roman",serif; font-weight:500; font-size:clamp(38px,5vw,66px); letter-spacing:4px; color:var(--gold-soft); }
+.site-header .subtitle { margin-top:5px; font-family:Georgia,"Times New Roman",serif; font-size:clamp(18px,2vw,27px); letter-spacing:4px; color:var(--gold-soft); }
+.site-header .ornament { margin-top:10px; color:var(--gold); font-size:22px; letter-spacing:8px; }
+.page-layout { max-width:1100px; margin:auto; position:relative; }
+.side-panel {
+    position:absolute; top:0; width:340px; min-height:650px; padding:28px 24px;
+    background:linear-gradient(180deg,rgba(3,15,17,.94),rgba(3,15,17,.82));
+    border:2px solid var(--line); border-radius:22px; box-shadow:0 12px 45px rgba(0,0,0,.5), inset 0 0 28px rgba(214,173,85,.04); backdrop-filter:blur(3px);
 }
-
-.featured-panel {
-    position: absolute;
-    top: 0;
-    right: calc(100% + 24px);
-    width: 340px;
-    box-sizing: border-box;
-    padding: 28px 24px;
-    background: rgba(8, 22, 16, 0.78);
-    border: 1px solid rgba(220, 230, 215, 0.18);
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.38);
-    backdrop-filter: blur(3px);
-    min-height: 650px;
-}
-
-.featured-panel h2 {
-    margin: 0;
-    color: #f4ecd0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    text-align: center;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.75);
-}
-
-.container {
-    max-width: 1100px;
-    margin: auto;
-    padding: 28px;
-    background: rgba(8, 22, 16, 0.78);
-    border: 1px solid rgba(220, 230, 215, 0.18);
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.38);
-    backdrop-filter: blur(3px);
-}
-
-h1 {
-    text-align: center;
-    margin: 0 0 25px;
-    color: #f1ead2;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.75);
-}
-
-.brand-header {
-    text-align: center;
-    margin-bottom: 26px;
-    padding: 10px 10px 20px;
-    border-bottom: 1px solid rgba(235, 226, 190, 0.22);
-}
-
-.brand-kicker {
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 4px;
-    color: #c9c7ad;
-    margin-bottom: 8px;
-}
-
-.brand-header h1 {
-    margin: 0;
-    color: #f4ecd0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(30px, 5vw, 52px);
-    font-weight: 500;
-    letter-spacing: 3px;
-    line-height: 1.05;
-    text-shadow: 0 3px 14px rgba(0,0,0,0.85);
-}
-
-.brand-subtitle {
-    margin-top: 9px;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 18px;
-    font-style: italic;
-    letter-spacing: 1px;
-    color: #ded9c2;
-}
-
-.catalogue-tools {
-    background: rgba(3, 14, 10, 0.38);
-    border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 20px;
-}
-
-.search-box {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 14px;
-    font-size: 18px;
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 8px;
-    margin-bottom: 20px;
-    background: rgba(255,255,255,0.94);
-    color: #222;
-}
-
-.sort-box {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-}
-
-.sort-box select {
-    padding: 10px;
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 6px;
-    background: rgba(255,255,255,0.94);
-    color: #222;
-}
-
-#status {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #e8eadf;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-}
-
-#products {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-}
-
-.product {
-    background: rgba(250, 250, 245, 0.95);
-    padding: 12px;
-    border-radius: 8px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.28);
-    border: 1px solid rgba(255,255,255,0.55);
-    box-sizing: border-box;
-    color: #222;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.product:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 18px rgba(0,0,0,0.34);
-}
-
-.product h2 {
-    margin-top: 0;
-    font-size: 16px;
-    line-height: 1.25;
-    margin-bottom: 8px;
-}
-
-.region {
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-
-.coordinates {
-    font-size: 13px;
-    margin-bottom: 10px;
-}
-
-.teleport {
-    display: inline-block;
-    background: #4b6f44;
-    color: white;
-    padding: 7px 10px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 13px;
-}
-
-.teleport:hover {
-    opacity: 1;
-    filter: brightness(1.12);
-    transform: translateY(-1px);
-}
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-}
-
-.pagination button {
-    padding: 9px 13px;
-    border: 1px solid #aaa;
-    background: rgba(255,255,255,0.94);
-    border-radius: 5px;
-    cursor: pointer;
-    color: #26352a;
-}
-
-.pagination button:hover { background: #eee; }
-.pagination button.active { font-weight: bold; background: #ddd; }
-.pagination button:disabled { opacity: 0.4; cursor: default; }
-
-@media (max-width: 1650px) {
-    .featured-panel {
-        position: static;
-        width: auto;
-        min-height: 420px;
-        margin-bottom: 22px;
-    }
-}
-
-@media (max-width: 1000px) {
-    #products { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (max-width: 650px) {
-    body { padding: 15px; }
-    .container { padding: 18px; }
-    .featured-panel { padding: 18px; min-height: 320px; }
-    .brand-header h1 { letter-spacing: 2px; }
-    .brand-subtitle { font-size: 16px; }
-    .catalogue-tools { padding: 12px; }
-    #products { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 450px) {
-    #products { grid-template-columns: 1fr; }
-}
+.featured-panel { right:calc(100% + 24px); }
+.dk-panel { left:calc(100% + 24px); }
+.side-panel h2 { margin:0; color:var(--gold-soft); font-family:Georgia,"Times New Roman",serif; font-size:26px; font-weight:500; letter-spacing:1px; text-align:center; text-shadow:0 2px 8px #000; }
+.side-panel h2::after { content:"◆ ───── ◆"; display:block; margin-top:12px; color:var(--gold); font-size:11px; letter-spacing:2px; }
+.container { max-width:1100px; margin:auto; padding:30px; background:var(--panel); border:2px solid rgba(214,173,85,.58); border-radius:24px; box-shadow:0 14px 48px rgba(0,0,0,.55); backdrop-filter:blur(4px); }
+.brand-header { text-align:center; margin-bottom:24px; padding:5px 10px 22px; border-bottom:1px solid rgba(214,173,85,.3); }
+.brand-kicker { font-size:11px; font-weight:bold; letter-spacing:5px; color:#bca66f; margin-bottom:7px; }
+.brand-header h1 { margin:0; color:var(--purple); font-family:Georgia,"Times New Roman",serif; font-size:clamp(28px,4vw,43px); font-weight:500; letter-spacing:2px; text-shadow:0 3px 14px #000; }
+.brand-subtitle { margin-top:8px; font-family:Georgia,"Times New Roman",serif; font-size:16px; font-style:italic; letter-spacing:1px; color:#ded9c2; }
+.catalogue-tools { background:rgba(0,0,0,.22); border:1px solid rgba(214,173,85,.18); border-radius:12px; padding:16px; margin-bottom:20px; }
+.search-box { width:100%; padding:14px; font-size:17px; border:1px solid rgba(214,173,85,.32); border-radius:8px; margin-bottom:16px; background:rgba(5,14,18,.86); color:#fff; outline:none; }
+.search-box:focus { border-color:var(--purple); box-shadow:0 0 0 2px rgba(200,156,255,.12); }
+.sort-box { display:flex; justify-content:flex-end; margin-bottom:4px; }
+.sort-box select { padding:9px 12px; border:1px solid rgba(214,173,85,.3); border-radius:6px; background:#10191c; color:#eee; }
+#status { margin:8px 0 18px; color:#e8eadf; text-shadow:0 1px 4px #000; }
+#products { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.product { background:linear-gradient(180deg,rgba(11,25,29,.96),rgba(7,18,21,.96)); padding:13px; border-radius:9px; box-shadow:0 3px 10px rgba(0,0,0,.3); border:1px solid rgba(160,176,178,.24); color:#f4f0e3; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
+.product:hover { transform:translateY(-2px); box-shadow:0 7px 18px rgba(0,0,0,.4); border-color:rgba(214,173,85,.55); }
+.product h2 { margin:0 0 8px; font-size:16px; line-height:1.25; color:var(--gold-soft); }
+.region { font-weight:bold; font-size:13px; margin-bottom:5px; color:#d3b2f6; }
+.coordinates { font-size:12px; margin-bottom:10px; color:#ddd; }
+.teleport { display:inline-block; color:var(--purple); padding:5px 0; text-decoration:none; font-weight:bold; font-size:12px; letter-spacing:.4px; }
+.teleport:hover { filter:brightness(1.18); transform:translateY(-1px); }
+.pagination { display:flex; justify-content:center; align-items:center; gap:6px; margin-top:30px; flex-wrap:wrap; }
+.pagination button { padding:9px 13px; border:1px solid rgba(214,173,85,.4); background:#111c20; border-radius:5px; cursor:pointer; color:#eee; }
+.pagination button:hover { background:#1d2b30; }
+.pagination button.active { font-weight:bold; color:var(--gold-soft); border-color:var(--gold); }
+.pagination button:disabled { opacity:.4; cursor:default; }
+.site-footer { text-align:center; margin:28px auto 0; font-family:Georgia,"Times New Roman",serif; letter-spacing:3px; color:var(--gold-soft); text-shadow:0 2px 8px #000; font-size:14px; }
+@media(max-width:1850px){ .side-panel { width:300px; } }
+@media(max-width:1720px){ .side-panel { position:static; width:100%; min-height:260px; margin-bottom:22px; } .dk-panel{ margin-top:22px; } }
+@media(max-width:1000px){ #products{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:650px){ body{padding:15px;} .container{padding:18px;} .side-panel{padding:18px;min-height:220px;} #products{grid-template-columns:repeat(2,1fr);} .site-header h1{letter-spacing:2px;} }
+@media(max-width:450px){ #products{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
-
+<header class="site-header">
+    <h1>TWO MOON GARDENS</h1>
+    <div class="subtitle">PRODUCT CATALOGUE</div>
+    <div class="ornament">❧ ◇ ❧</div>
+</header>
 <div class="page-layout">
-    <aside class="featured-panel">
-        <h2>FEATURED PRODUCTS</h2>
-    </aside>
-
+    <aside class="side-panel featured-panel"><h2>FEATURED PRODUCTS</h2></aside>
     <div class="container">
         <header class="brand-header">
             <div class="brand-kicker">SECOND LIFE</div>
-            <h1>TWO MOON GARDENS</h1>
-            <div class="brand-subtitle">Product Catalogue</div>
+            <h1>TMG PRODUCT CATALOGUE</h1>
+            <div class="brand-subtitle">Designs for beautiful Second Life spaces</div>
         </header>
-
         <div class="catalogue-tools">
-            <input
-                type="text"
-                id="search"
-                class="search-box"
-                placeholder="Search the Two Moon Gardens catalogue..."
-                aria-label="Search products"
-            >
-
-            <div class="sort-box">
-                <label for="sort" style="margin-right:10px; align-self:center; color:#e8eadf; font-size:14px;">Sort</label>
-                <select id="sort" aria-label="Sort products">
-                    <option value="az">A–Z</option>
-                    <option value="za">Z–A</option>
-                </select>
-            </div>
+            <input type="text" id="search" class="search-box" placeholder="Search for products, regions, or keywords..." aria-label="Search products">
+            <div class="sort-box"><label for="sort" style="margin-right:10px;align-self:center;color:#e8eadf;font-size:14px;">Sort</label><select id="sort" aria-label="Sort products"><option value="az">A–Z</option><option value="za">Z–A</option></select></div>
         </div>
-
         <div id="status">Loading products...</div>
         <div id="products"></div>
         <div id="pagination" class="pagination"></div>
     </div>
+    <aside class="side-panel dk-panel"><h2>DK DESIGNS</h2></aside>
 </div>
-
+<footer class="site-footer">◆ &nbsp; DESIGNS FOR BEAUTIFUL SECOND LIFE SPACES &nbsp; ◆</footer>
 <script>
-const SHEET_ID = "1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json";
-const PRODUCTS_PER_PAGE = 100;
-
-let products = [];
-let filteredProducts = [];
-let currentPage = 1;
-
-function loadProducts() {
-    const status = document.getElementById("status");
-    status.textContent = "Loading products...";
-
-    fetch(SHEET_URL)
-    .then(function(response) {
-        if (!response.ok) {
-            throw new Error("Google Sheets returned HTTP " + response.status);
-        }
-        return response.text();
-    })
-    .then(function(text) {
-        console.log("Google Sheets response received.");
-
-        const start = text.indexOf("{");
-        const end = text.lastIndexOf("}");
-
-        if (start === -1 || end === -1) {
-            throw new Error("Could not find valid JSON in Google Sheets response.");
-        }
-
-        const json = JSON.parse(text.substring(start, end + 1));
-
-        if (!json.table) {
-            throw new Error("Google Sheets returned no table data.");
-        }
-
-        const rows = json.table.rows || [];
-
-        products = rows.map(function(row) {
-            const cells = row.c || [];
-            return {
-                product: cells[0]?.v ?? "",
-                region: cells[1]?.v ?? "",
-                x: cells[2]?.v ?? "",
-                y: cells[3]?.v ?? "",
-                z: cells[4]?.v ?? ""
-            };
-        });
-
-        products = products.filter(function(product) {
-            return String(product.product).trim() !== "";
-        });
-
-        if (products.length === 0) {
-            throw new Error("The Google Sheet loaded, but contains no products.");
-        }
-
-        filteredProducts = products.slice();
-        console.log("Products loaded:", products.length);
-        sortProducts();
-    })
-    .catch(function(error) {
-        console.error("TMG catalogue error:", error);
-        status.innerHTML = "<strong>Unable to load products.</strong><br><small>" + escapeHTML(error.message) + "</small>";
-    });
-}
-
-function sortProducts() {
-    const sort = document.getElementById("sort").value;
-
-    filteredProducts.sort(function(a, b) {
-        const nameA = String(a.product).toLowerCase();
-        const nameB = String(b.product).toLowerCase();
-        return sort === "az" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-    });
-
-    currentPage = 1;
-    displayPage();
-}
-
-function filterProducts() {
-    const search = document.getElementById("search").value.toLowerCase().trim();
-
-    filteredProducts = products.filter(function(product) {
-        return String(product.product).toLowerCase().includes(search);
-    });
-
-    sortProducts();
-}
-
-function displayPage() {
-    const container = document.getElementById("products");
-    const status = document.getElementById("status");
-
-    container.innerHTML = "";
-
-    const total = filteredProducts.length;
-    const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PER_PAGE));
-
-    if (currentPage > totalPages) currentPage = totalPages;
-
-    const start = (currentPage - 1) * PRODUCTS_PER_PAGE;
-    const end = Math.min(start + PRODUCTS_PER_PAGE, total);
-    const pageProducts = filteredProducts.slice(start, end);
-
-    if (total === 0) {
-        status.textContent = "No products found.";
-    } else {
-        status.textContent = "Showing " + (start + 1) + "–" + end + " of " + total + " products";
-    }
-
-    pageProducts.forEach(function(product) {
-        const region = encodeURIComponent(String(product.region).trim());
-        const x = String(product.x).trim();
-        const y = String(product.y).trim();
-        const z = String(product.z).trim();
-        const slurl = "http://maps.secondlife.com/secondlife/" + region + "/" + x + "/" + y + "/" + z;
-
-        const card = document.createElement("div");
-        card.className = "product";
-        card.innerHTML = `
-            <h2>${escapeHTML(product.product)}</h2>
-            <div class="region">${escapeHTML(product.region)}</div>
-            <div class="coordinates">${escapeHTML(product.x)}, ${escapeHTML(product.y)}, ${escapeHTML(product.z)}</div>
-            <a class="teleport" href="${slurl}" target="_blank" rel="noopener">TELEPORT</a>
-        `;
-        container.appendChild(card);
-    });
-
-    createPagination(totalPages);
-}
-
-function createPagination(totalPages) {
-    const container = document.getElementById("pagination");
-    container.innerHTML = "";
-
-    if (totalPages <= 1) return;
-
-    const previous = document.createElement("button");
-    previous.textContent = "← Previous";
-    previous.disabled = currentPage === 1;
-    previous.onclick = function() {
-        currentPage--;
-        displayPage();
-        window.scrollTo(0, 0);
-    };
-    container.appendChild(previous);
-
-    for (let page = 1; page <= totalPages; page++) {
-        const button = document.createElement("button");
-        button.textContent = page;
-        if (page === currentPage) button.className = "active";
-        button.onclick = function() {
-            currentPage = page;
-            displayPage();
-            window.scrollTo(0, 0);
-        };
-        container.appendChild(button);
-    }
-
-    const next = document.createElement("button");
-    next.textContent = "Next →";
-    next.disabled = currentPage === totalPages;
-    next.onclick = function() {
-        currentPage++;
-        displayPage();
-        window.scrollTo(0, 0);
-    };
-    container.appendChild(next);
-}
-
-function escapeHTML(text) {
-    return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-document.getElementById("search").addEventListener("input", filterProducts);
-document.getElementById("sort").addEventListener("change", sortProducts);
-loadProducts();
+const SHEET_ID="1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
+const SHEET_URL="https://docs.google.com/spreadsheets/d/"+SHEET_ID+"/gviz/tq?tqx=out:json";
+const PRODUCTS_PER_PAGE=100;
+let products=[],filteredProducts=[],currentPage=1;
+function loadProducts(){const status=document.getElementById("status");status.textContent="Loading products...";fetch(SHEET_URL).then(function(response){if(!response.ok)throw new Error("Google Sheets returned HTTP "+response.status);return response.text();}).then(function(text){const start=text.indexOf("{");const end=text.lastIndexOf("}");if(start===-1||end===-1)throw new Error("Could not find valid JSON in Google Sheets response.");const json=JSON.parse(text.substring(start,end+1));if(!json.table)throw new Error("Google Sheets returned no table data.");const rows=json.table.rows||[];products=rows.map(function(row){const cells=row.c||[];return{product:cells[0]?.v??"",region:cells[1]?.v??"",x:cells[2]?.v??"",y:cells[3]?.v??"",z:cells[4]?.v??""};});products=products.filter(function(product){return String(product.product).trim()!=="";});if(products.length===0)throw new Error("The Google Sheet loaded, but contains no products.");filteredProducts=products.slice();sortProducts();}).catch(function(error){console.error("TMG catalogue error:",error);status.innerHTML="<strong>Unable to load products.</strong><br><small>"+escapeHTML(error.message)+"</small>";});}
+function sortProducts(){const sort=document.getElementById("sort").value;filteredProducts.sort(function(a,b){const nameA=String(a.product).toLowerCase(),nameB=String(b.product).toLowerCase();return sort==="az"?nameA.localeCompare(nameB):nameB.localeCompare(nameA);});currentPage=1;displayPage();}
+function filterProducts(){const search=document.getElementById("search").value.toLowerCase().trim();filteredProducts=products.filter(function(product){return String(product.product).toLowerCase().includes(search)||String(product.region).toLowerCase().includes(search);});sortProducts();}
+function displayPage(){const container=document.getElementById("products"),status=document.getElementById("status");container.innerHTML="";const total=filteredProducts.length,totalPages=Math.max(1,Math.ceil(total/PRODUCTS_PER_PAGE));if(currentPage>totalPages)currentPage=totalPages;const start=(currentPage-1)*PRODUCTS_PER_PAGE,end=Math.min(start+PRODUCTS_PER_PAGE,total),pageProducts=filteredProducts.slice(start,end);status.textContent=total===0?"No products found.":"Showing "+(start+1)+"–"+end+" of "+total+" products";pageProducts.forEach(function(product){const region=encodeURIComponent(String(product.region).trim()),x=String(product.x).trim(),y=String(product.y).trim(),z=String(product.z).trim(),slurl="http://maps.secondlife.com/secondlife/"+region+"/"+x+"/"+y+"/"+z;const card=document.createElement("div");card.className="product";card.innerHTML=`<h2>${escapeHTML(product.product)}</h2><div class="region">${escapeHTML(product.region)}</div><div class="coordinates">${escapeHTML(product.x)}, ${escapeHTML(product.y)}, ${escapeHTML(product.z)}</div><a class="teleport" href="${slurl}" target="_blank" rel="noopener">TELEPORT ↗</a>`;container.appendChild(card);});createPagination(totalPages);}
+function createPagination(totalPages){const container=document.getElementById("pagination");container.innerHTML="";if(totalPages<=1)return;const previous=document.createElement("button");previous.textContent="← Previous";previous.disabled=currentPage===1;previous.onclick=function(){currentPage--;displayPage();window.scrollTo(0,0);};container.appendChild(previous);for(let page=1;page<=totalPages;page++){const button=document.createElement("button");button.textContent=page;if(page===currentPage)button.className="active";button.onclick=function(){currentPage=page;displayPage();window.scrollTo(0,0);};container.appendChild(button);}const next=document.createElement("button");next.textContent="Next →";next.disabled=currentPage===totalPages;next.onclick=function(){currentPage++;displayPage();window.scrollTo(0,0);};container.appendChild(next);}
+function escapeHTML(text){return String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");}
+document.getElementById("search").addEventListener("input",filterProducts);document.getElementById("sort").addEventListener("change",sortProducts);loadProducts();
 </script>
-
 </body>
 </html>
