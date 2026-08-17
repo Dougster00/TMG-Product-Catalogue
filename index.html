@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>TMG Product Catalogue</title>
-
 <style>
-
 body {
     font-family: Arial, sans-serif;
     background:
@@ -22,15 +17,17 @@ body {
 }
 
 .page-layout {
-    max-width: 1420px;
+    max-width: 1100px;
     margin: auto;
-    display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 22px;
-    align-items: start;
+    position: relative;
 }
 
 .featured-panel {
+    position: absolute;
+    top: 0;
+    right: calc(100% + 24px);
+    width: 240px;
+    box-sizing: border-box;
     padding: 24px 20px;
     background: rgba(8, 22, 16, 0.78);
     border: 1px solid rgba(220, 230, 215, 0.18);
@@ -53,8 +50,7 @@ body {
 
 .container {
     max-width: 1100px;
-    width: 100%;
-    margin: 0;
+    margin: auto;
     padding: 28px;
     background: rgba(8, 22, 16, 0.78);
     border: 1px solid rgba(220, 230, 215, 0.18);
@@ -124,12 +120,6 @@ h1 {
     margin-bottom: 20px;
     background: rgba(255,255,255,0.94);
     color: #222;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.product:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 18px rgba(0,0,0,0.34);
 }
 
 .sort-box {
@@ -167,6 +157,12 @@ h1 {
     border: 1px solid rgba(255,255,255,0.55);
     box-sizing: border-box;
     color: #222;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.product:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 18px rgba(0,0,0,0.34);
 }
 
 .product h2 {
@@ -222,138 +218,79 @@ h1 {
     color: #26352a;
 }
 
-.pagination button:hover {
-    background: #eee;
-}
+.pagination button:hover { background: #eee; }
+.pagination button.active { font-weight: bold; background: #ddd; }
+.pagination button:disabled { opacity: 0.4; cursor: default; }
 
-.pagination button.active {
-    font-weight: bold;
-    background: #ddd;
-}
-
-.pagination button:disabled {
-    opacity: 0.4;
-    cursor: default;
+@media (max-width: 1500px) {
+    .featured-panel {
+        position: static;
+        width: auto;
+        min-height: auto;
+        margin-bottom: 22px;
+    }
 }
 
 @media (max-width: 1000px) {
-    .page-layout {
-        grid-template-columns: 1fr;
-        max-width: 1100px;
-    }
-
-    .featured-panel {
-        min-height: auto;
-    }
-
-    #products {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    #products { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 650px) {
-    body {
-        padding: 15px;
-    }
-
-    .container {
-        padding: 18px;
-    }
-
-    .featured-panel {
-        padding: 18px;
-    }
-
-    .brand-header h1 {
-        letter-spacing: 2px;
-    }
-
-    .brand-subtitle {
-        font-size: 16px;
-    }
-
-    .catalogue-tools {
-        padding: 12px;
-    }
-
-    #products {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    body { padding: 15px; }
+    .container { padding: 18px; }
+    .featured-panel { padding: 18px; }
+    .brand-header h1 { letter-spacing: 2px; }
+    .brand-subtitle { font-size: 16px; }
+    .catalogue-tools { padding: 12px; }
+    #products { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 450px) {
-    #products {
-        grid-template-columns: 1fr;
-    }
+    #products { grid-template-columns: 1fr; }
 }
-
 </style>
-
 </head>
-
 <body>
 
 <div class="page-layout">
+    <aside class="featured-panel">
+        <h2>FEATURED PRODUCTS</h2>
+    </aside>
 
-<aside class="featured-panel">
-    <h2>FEATURED PRODUCTS</h2>
-</aside>
+    <div class="container">
+        <header class="brand-header">
+            <div class="brand-kicker">SECOND LIFE</div>
+            <h1>TWO MOON GARDENS</h1>
+            <div class="brand-subtitle">Product Catalogue</div>
+        </header>
 
-<div class="container">
+        <div class="catalogue-tools">
+            <input
+                type="text"
+                id="search"
+                class="search-box"
+                placeholder="Search the Two Moon Gardens catalogue..."
+                aria-label="Search products"
+            >
 
-<header class="brand-header">
-    <div class="brand-kicker">SECOND LIFE</div>
-    <h1>TWO MOON GARDENS</h1>
-    <div class="brand-subtitle">Product Catalogue</div>
-</header>
+            <div class="sort-box">
+                <label for="sort" style="margin-right:10px; align-self:center; color:#e8eadf; font-size:14px;">Sort</label>
+                <select id="sort" aria-label="Sort products">
+                    <option value="az">A–Z</option>
+                    <option value="za">Z–A</option>
+                </select>
+            </div>
+        </div>
 
-<div class="catalogue-tools">
-
-<input
-    type="text"
-    id="search"
-    class="search-box"
-    placeholder="Search the Two Moon Gardens catalogue..."
-    aria-label="Search products"
->
-
-<div class="sort-box">
-
-<label for="sort" style="margin-right:10px; align-self:center; color:#e8eadf; font-size:14px;">Sort</label>
-
-<select id="sort" aria-label="Sort products">
-
-    <option value="az">A–Z</option>
-    <option value="za">Z–A</option>
-
-</select>
-
-</div>
-
-</div>
-
-<div id="status">
-    Loading products...
-</div>
-
-<div id="products"></div>
-
-<div id="pagination" class="pagination"></div>
-
-</div>
-
+        <div id="status">Loading products...</div>
+        <div id="products"></div>
+        <div id="pagination" class="pagination"></div>
+    </div>
 </div>
 
 <script>
-
-const SHEET_ID =
-"1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
-
-const SHEET_URL =
-"https://docs.google.com/spreadsheets/d/" +
-SHEET_ID +
-"/gviz/tq?tqx=out:json";
-
+const SHEET_ID = "1HcWx845mSpfJnwziugByJLn0Npc1aBSomOBa6esQWVM";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/" + SHEET_ID + "/gviz/tq?tqx=out:json";
 const PRODUCTS_PER_PAGE = 100;
 
 let products = [];
@@ -361,123 +298,70 @@ let filteredProducts = [];
 let currentPage = 1;
 
 function loadProducts() {
-    const status =
-        document.getElementById("status");
-
-    status.textContent =
-        "Loading products...";
+    const status = document.getElementById("status");
+    status.textContent = "Loading products...";
 
     fetch(SHEET_URL)
     .then(function(response) {
         if (!response.ok) {
-            throw new Error(
-                "Google Sheets returned HTTP " +
-                response.status
-            );
+            throw new Error("Google Sheets returned HTTP " + response.status);
         }
-
         return response.text();
     })
     .then(function(text) {
         console.log("Google Sheets response received.");
 
-        const start =
-            text.indexOf("{");
-
-        const end =
-            text.lastIndexOf("}");
+        const start = text.indexOf("{");
+        const end = text.lastIndexOf("}");
 
         if (start === -1 || end === -1) {
-            throw new Error(
-                "Could not find valid JSON in Google Sheets response."
-            );
+            throw new Error("Could not find valid JSON in Google Sheets response.");
         }
 
-        const json =
-            JSON.parse(
-                text.substring(start, end + 1)
-            );
+        const json = JSON.parse(text.substring(start, end + 1));
 
         if (!json.table) {
-            throw new Error(
-                "Google Sheets returned no table data."
-            );
+            throw new Error("Google Sheets returned no table data.");
         }
 
-        const rows =
-            json.table.rows || [];
+        const rows = json.table.rows || [];
 
-        products =
-            rows.map(function(row) {
-                const cells =
-                    row.c || [];
+        products = rows.map(function(row) {
+            const cells = row.c || [];
+            return {
+                product: cells[0]?.v ?? "",
+                region: cells[1]?.v ?? "",
+                x: cells[2]?.v ?? "",
+                y: cells[3]?.v ?? "",
+                z: cells[4]?.v ?? ""
+            };
+        });
 
-                return {
-                    product:
-                        cells[0]?.v ?? "",
-                    region:
-                        cells[1]?.v ?? "",
-                    x:
-                        cells[2]?.v ?? "",
-                    y:
-                        cells[3]?.v ?? "",
-                    z:
-                        cells[4]?.v ?? ""
-                };
-            });
-
-        products =
-            products.filter(function(product) {
-                return String(product.product)
-                    .trim() !== "";
-            });
+        products = products.filter(function(product) {
+            return String(product.product).trim() !== "";
+        });
 
         if (products.length === 0) {
-            throw new Error(
-                "The Google Sheet loaded, but contains no products."
-            );
+            throw new Error("The Google Sheet loaded, but contains no products.");
         }
 
-        filteredProducts =
-            products.slice();
-
-        console.log(
-            "Products loaded:",
-            products.length
-        );
-
+        filteredProducts = products.slice();
+        console.log("Products loaded:", products.length);
         sortProducts();
     })
     .catch(function(error) {
-        console.error(
-            "TMG catalogue error:",
-            error
-        );
-
-        status.innerHTML =
-            "<strong>Unable to load products.</strong><br>" +
-            "<small>" +
-            escapeHTML(error.message) +
-            "</small>";
+        console.error("TMG catalogue error:", error);
+        status.innerHTML = "<strong>Unable to load products.</strong><br><small>" + escapeHTML(error.message) + "</small>";
     });
 }
 
 function sortProducts() {
-    const sort =
-        document.getElementById("sort").value;
+    const sort = document.getElementById("sort").value;
 
     filteredProducts.sort(function(a, b) {
-        const nameA =
-            String(a.product).toLowerCase();
-
-        const nameB =
-            String(b.product).toLowerCase();
-
-        if (sort === "az") {
-            return nameA.localeCompare(nameB);
-        }
-
-        return nameB.localeCompare(nameA);
+        const nameA = String(a.product).toLowerCase();
+        const nameB = String(b.product).toLowerCase();
+        return sort === "az" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
 
     currentPage = 1;
@@ -485,133 +369,51 @@ function sortProducts() {
 }
 
 function filterProducts() {
-    const search =
-        document.getElementById("search")
-        .value
-        .toLowerCase()
-        .trim();
+    const search = document.getElementById("search").value.toLowerCase().trim();
 
-    filteredProducts =
-        products.filter(function(product) {
-            return String(product.product)
-                .toLowerCase()
-                .includes(search);
-        });
+    filteredProducts = products.filter(function(product) {
+        return String(product.product).toLowerCase().includes(search);
+    });
 
     sortProducts();
 }
 
 function displayPage() {
-    const container =
-        document.getElementById("products");
-
-    const status =
-        document.getElementById("status");
+    const container = document.getElementById("products");
+    const status = document.getElementById("status");
 
     container.innerHTML = "";
 
-    const total =
-        filteredProducts.length;
+    const total = filteredProducts.length;
+    const totalPages = Math.max(1, Math.ceil(total / PRODUCTS_PER_PAGE));
 
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                total / PRODUCTS_PER_PAGE
-            )
-        );
+    if (currentPage > totalPages) currentPage = totalPages;
 
-    if (currentPage > totalPages) {
-        currentPage = totalPages;
-    }
-
-    const start =
-        (currentPage - 1) *
-        PRODUCTS_PER_PAGE;
-
-    const end =
-        Math.min(
-            start + PRODUCTS_PER_PAGE,
-            total
-        );
-
-    const pageProducts =
-        filteredProducts.slice(
-            start,
-            end
-        );
+    const start = (currentPage - 1) * PRODUCTS_PER_PAGE;
+    const end = Math.min(start + PRODUCTS_PER_PAGE, total);
+    const pageProducts = filteredProducts.slice(start, end);
 
     if (total === 0) {
-        status.textContent =
-            "No products found.";
-    }
-    else {
-        status.textContent =
-            "Showing " +
-            (start + 1) +
-            "–" +
-            end +
-            " of " +
-            total +
-            " products";
+        status.textContent = "No products found.";
+    } else {
+        status.textContent = "Showing " + (start + 1) + "–" + end + " of " + total + " products";
     }
 
     pageProducts.forEach(function(product) {
-        const region =
-            encodeURIComponent(
-                String(product.region).trim()
-            );
+        const region = encodeURIComponent(String(product.region).trim());
+        const x = String(product.x).trim();
+        const y = String(product.y).trim();
+        const z = String(product.z).trim();
+        const slurl = "http://maps.secondlife.com/secondlife/" + region + "/" + x + "/" + y + "/" + z;
 
-        const x =
-            String(product.x).trim();
-
-        const y =
-            String(product.y).trim();
-
-        const z =
-            String(product.z).trim();
-
-        const slurl =
-            "http://maps.secondlife.com/secondlife/" +
-            region +
-            "/" +
-            x +
-            "/" +
-            y +
-            "/" +
-            z;
-
-        const card =
-            document.createElement("div");
-
-        card.className =
-            "product";
-
+        const card = document.createElement("div");
+        card.className = "product";
         card.innerHTML = `
-            <h2>
-                ${escapeHTML(product.product)}
-            </h2>
-
-            <div class="region">
-                ${escapeHTML(product.region)}
-            </div>
-
-            <div class="coordinates">
-                ${escapeHTML(product.x)},
-                ${escapeHTML(product.y)},
-                ${escapeHTML(product.z)}
-            </div>
-
-            <a
-                class="teleport"
-                href="${slurl}"
-                target="_blank"
-                rel="noopener"
-            >
-                TELEPORT
-            </a>
+            <h2>${escapeHTML(product.product)}</h2>
+            <div class="region">${escapeHTML(product.region)}</div>
+            <div class="coordinates">${escapeHTML(product.x)}, ${escapeHTML(product.y)}, ${escapeHTML(product.z)}</div>
+            <a class="teleport" href="${slurl}" target="_blank" rel="noopener">TELEPORT</a>
         `;
-
         container.appendChild(card);
     });
 
@@ -619,77 +421,41 @@ function displayPage() {
 }
 
 function createPagination(totalPages) {
-    const container =
-        document.getElementById("pagination");
-
+    const container = document.getElementById("pagination");
     container.innerHTML = "";
 
-    if (totalPages <= 1) {
-        return;
-    }
+    if (totalPages <= 1) return;
 
-    const previous =
-        document.createElement("button");
+    const previous = document.createElement("button");
+    previous.textContent = "← Previous";
+    previous.disabled = currentPage === 1;
+    previous.onclick = function() {
+        currentPage--;
+        displayPage();
+        window.scrollTo(0, 0);
+    };
+    container.appendChild(previous);
 
-    previous.textContent =
-        "← Previous";
-
-    previous.disabled =
-        currentPage === 1;
-
-    previous.onclick =
-        function() {
-            currentPage--;
+    for (let page = 1; page <= totalPages; page++) {
+        const button = document.createElement("button");
+        button.textContent = page;
+        if (page === currentPage) button.className = "active";
+        button.onclick = function() {
+            currentPage = page;
             displayPage();
             window.scrollTo(0, 0);
         };
-
-    container.appendChild(previous);
-
-    for (
-        let page = 1;
-        page <= totalPages;
-        page++
-    ) {
-        const button =
-            document.createElement("button");
-
-        button.textContent =
-            page;
-
-        if (page === currentPage) {
-            button.className =
-                "active";
-        }
-
-        button.onclick =
-            function() {
-                currentPage =
-                    page;
-
-                displayPage();
-                window.scrollTo(0, 0);
-            };
-
         container.appendChild(button);
     }
 
-    const next =
-        document.createElement("button");
-
-    next.textContent =
-        "Next →";
-
-    next.disabled =
-        currentPage === totalPages;
-
-    next.onclick =
-        function() {
-            currentPage++;
-            displayPage();
-            window.scrollTo(0, 0);
-        };
-
+    const next = document.createElement("button");
+    next.textContent = "Next →";
+    next.disabled = currentPage === totalPages;
+    next.onclick = function() {
+        currentPage++;
+        displayPage();
+        window.scrollTo(0, 0);
+    };
     container.appendChild(next);
 }
 
@@ -702,24 +468,10 @@ function escapeHTML(text) {
         .replace(/'/g, "&#039;");
 }
 
-document
-    .getElementById("search")
-    .addEventListener(
-        "input",
-        filterProducts
-    );
-
-document
-    .getElementById("sort")
-    .addEventListener(
-        "change",
-        sortProducts
-    );
-
+document.getElementById("search").addEventListener("input", filterProducts);
+document.getElementById("sort").addEventListener("change", sortProducts);
 loadProducts();
-
 </script>
 
 </body>
-
 </html>
