@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMG Admin Image Helper</title>
+<style>
+:root{--gold:#d6ad55;--gold-soft:#f0d28a;--purple:#c89cff;--panel:#07171a;--panel2:#0c1f23;--line:rgba(214,173,85,.68);--text:#f3f0e6;--muted:#c8c0aa}*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px;font-family:Arial,sans-serif;background:linear-gradient(rgba(2,8,16,.5),rgba(2,8,16,.65)),url("tmg-background.jpg") center/cover fixed no-repeat;color:var(--text)}.wrap{max-width:900px;margin:auto}.header{text-align:center;margin-bottom:24px}.header h1{margin:0;color:var(--gold-soft);font-family:Georgia,"Times New Roman",serif;font-weight:500;letter-spacing:3px;font-size:clamp(30px,5vw,48px)}.header p{color:var(--muted);margin:8px 0 0}.panel{background:linear-gradient(180deg,rgba(7,23,26,.97),rgba(4,15,18,.97));border:2px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 16px 50px rgba(0,0,0,.45)}label{display:block;margin:0 0 8px;color:var(--gold-soft);font-weight:bold}.product-input{width:100%;padding:13px 14px;border-radius:9px;border:1px solid rgba(214,173,85,.35);background:#0a1a1e;color:#fff;font-size:16px;margin-bottom:18px}.dropzone{border:2px dashed rgba(214,173,85,.7);border-radius:16px;padding:38px 18px;text-align:center;background:rgba(0,0,0,.18);cursor:pointer;transition:.18s ease}.dropzone.dragover{background:rgba(214,173,85,.09);border-color:var(--gold-soft)}.dropzone strong{display:block;color:var(--gold-soft);font-size:20px;margin-bottom:7px}.dropzone span{color:var(--muted)}#fileInput{display:none}.preview-wrap{display:none;margin-top:22px;grid-template-columns:minmax(0,1fr) minmax(260px,.8fr);gap:22px;align-items:start}.preview-wrap.show{display:grid}.preview-card{background:#061216;border:1px solid rgba(214,173,85,.28);border-radius:14px;padding:12px}.preview-card img{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:10px;background:#02090b}.details{background:rgba(0,0,0,.16);border:1px solid rgba(214,173,85,.22);border-radius:14px;padding:16px}.filename{word-break:break-all;font-family:monospace;color:var(--purple);font-size:14px;background:#091519;border-radius:8px;padding:12px;margin:8px 0 14px}.buttons{display:flex;gap:10px;flex-wrap:wrap}.btn{appearance:none;border:1px solid var(--line);border-radius:9px;background:#162a2f;color:var(--gold-soft);padding:11px 15px;font-weight:bold;cursor:pointer;text-decoration:none}.btn:hover{border-color:var(--gold-soft);background:#1d353b}.note{margin-top:20px;padding:14px 16px;border-left:3px solid var(--gold);background:rgba(214,173,85,.08);color:#ded7c4;line-height:1.55}.steps{margin-top:18px;color:#e5dfd0;line-height:1.65}.steps strong{color:var(--gold-soft)}@media(max-width:700px){body{padding:15px}.panel{padding:17px}.preview-wrap.show{grid-template-columns:1fr}.dropzone{padding:28px 14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="header"><h1>TMG IMAGE ADMIN</h1><p>Prepare product images for the Two Moon Gardens catalogue</p></header>
+<section class="panel">
+<label for="productName">Product name</label>
+<input id="productName" class="product-input" type="text" placeholder="Example: Halloween Pumpkin Man 5" autocomplete="off">
+<div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Choose or drop an image">
+<strong>DRAG PRODUCT IMAGE HERE</strong><span>or click to choose a JPG, PNG or WebP image</span>
+</div>
+<input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp">
+<div id="previewWrap" class="preview-wrap">
+<div class="preview-card"><img id="preview" alt="Selected product preview"></div>
+<div class="details">
+<label>Suggested catalogue filename</label>
+<div id="filename" class="filename">—</div>
+<div class="buttons"><button id="downloadBtn" class="btn" type="button">DOWNLOAD RENAMED COPY</button><button id="copyBtn" class="btn" type="button">COPY FILENAME</button></div>
+<div class="steps"><strong>Then:</strong><br>1. Upload the renamed image to the root of the GitHub repository.<br>2. Paste the filename into the product's <strong>IMAGE</strong> cell in Google Sheets.<br>3. The catalogue will use it automatically.</div>
+</div>
+</div>
+<div class="note"><strong>Important:</strong> this helper does not store your image or your GitHub credentials. Everything on this page happens locally in your browser. It prepares the image name and preview safely, while the actual upload to GitHub remains manual.</div>
+</section>
+</div>
+<script>
+const productName=document.getElementById('productName'),dropzone=document.getElementById('dropzone'),fileInput=document.getElementById('fileInput'),previewWrap=document.getElementById('previewWrap'),preview=document.getElementById('preview'),filenameEl=document.getElementById('filename'),downloadBtn=document.getElementById('downloadBtn'),copyBtn=document.getElementById('copyBtn');let currentFile=null,currentUrl='';
+function slugify(s){return String(s||'').trim().toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').replace(/-+/g,'-')}
+function extFor(file){const n=file.name.toLowerCase();if(file.type==='image/png'||n.endsWith('.png'))return'.png';if(file.type==='image/webp'||n.endsWith('.webp'))return'.webp';return'.jpg'}
+function suggestedName(){if(!currentFile)return'';const base=slugify(productName.value)||slugify(currentFile.name.replace(/\.[^.]+$/,''))||'tmg-product-image';return base+extFor(currentFile)}
+function refreshName(){filenameEl.textContent=suggestedName()||'—'}
+function handleFile(file){if(!file||!/^image\/(jpeg|png|webp)$/.test(file.type)){alert('Please choose a JPG, PNG or WebP image.');return}currentFile=file;if(currentUrl)URL.revokeObjectURL(currentUrl);currentUrl=URL.createObjectURL(file);preview.src=currentUrl;previewWrap.classList.add('show');refreshName()}
+dropzone.addEventListener('click',()=>fileInput.click());dropzone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fileInput.click()}});fileInput.addEventListener('change',()=>handleFile(fileInput.files[0]));['dragenter','dragover'].forEach(type=>dropzone.addEventListener(type,e=>{e.preventDefault();dropzone.classList.add('dragover')}));['dragleave','drop'].forEach(type=>dropzone.addEventListener(type,e=>{e.preventDefault();dropzone.classList.remove('dragover')}));dropzone.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));productName.addEventListener('input',refreshName);
+downloadBtn.addEventListener('click',()=>{if(!currentFile)return;const a=document.createElement('a');a.href=currentUrl;a.download=suggestedName();document.body.appendChild(a);a.click();a.remove()});
+copyBtn.addEventListener('click',async()=>{const text=suggestedName();if(!text)return;try{await navigator.clipboard.writeText(text);copyBtn.textContent='COPIED';setTimeout(()=>copyBtn.textContent='COPY FILENAME',1200)}catch{prompt('Copy this filename:',text)}});
+</script>
+</body>
+</html>
