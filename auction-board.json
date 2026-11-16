@@ -8,7 +8,7 @@
   "bid_increment": 5,
   "min_bid_percent": 0,
   "duration_minutes": 60,
-  "award_prize": true,
+  "award_prize": false,
   "show_bidder": true,
   "owner_percent": 25,
   "creator_percent": 75,
