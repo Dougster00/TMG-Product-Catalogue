@@ -9,5 +9,8 @@
   "min_bid_percent": 0,
   "duration_minutes": 60,
   "award_prize": true,
-  "show_bidder": true
+  "show_bidder": true,
+  "owner_percent": 25,
+  "creator_percent": 75,
+  "creator_key": "8119b045-0450-45ef-ac62-a07ba745d3ac"
 }
