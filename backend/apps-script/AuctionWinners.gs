@@ -39,7 +39,7 @@ function doPost(e) {
 
     sheet.appendRow([
       new Date(), requestId, boardId, item, winnerName, winnerUuid,
-      Math.floor(bid), "Received"
+      Math.floor(bid), "Received", closedUtc
     ]);
     return jsonOutput_({ ok: true, duplicate: false });
   } catch (err) {
@@ -53,13 +53,13 @@ function doGet(e) {
   try {
     const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
     if (!sheet || sheet.getLastRow() < 2) return publicOutput_(e, []);
-    const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 8).getValues();
+    const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 9).getValues();
     const winners = values
       .filter(row => row[7] === "Received")
       .slice(-100)
       .reverse()
       .map(row => ({
-        closed: row[0] instanceof Date ? row[0].toISOString() : String(row[0]),
+        closed: String(row[8]),
         item: String(row[3]),
         winner: String(row[4]),
         bid: Number(row[6]) || 0
