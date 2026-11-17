@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Auction Winners | Two Moon Gardens</title>
+<style>
+:root{--gold:#d6ad55;--gold-soft:#f0d28a;--panel:rgba(3,14,17,.94);--line:rgba(214,173,85,.72);--muted:#d9d2c0}*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px 16px;background:linear-gradient(rgba(2,8,16,.55),rgba(2,8,16,.72)),url("tmg-background.jpg") center/cover fixed no-repeat;color:#f6f1e3;font:16px Arial,sans-serif}.wrap{max-width:960px;margin:auto}.head,.panel{background:var(--panel);border:2px solid var(--line);border-radius:18px;box-shadow:0 12px 38px #0008}.head{text-align:center;padding:25px;margin-bottom:20px}.head h1{margin:0;color:var(--gold-soft);font:500 clamp(30px,5vw,48px) Georgia,serif;letter-spacing:2px}.head p{color:var(--muted)}a{color:var(--gold-soft)}.back{display:inline-block;margin-top:5px}.panel{padding:22px}.status{color:var(--muted);padding:10px 0}.winner{display:grid;grid-template-columns:1fr auto;gap:8px 18px;padding:16px 4px;border-bottom:1px solid #d6ad5555}.winner:last-child{border-bottom:0}.name{font:22px Georgia,serif;color:var(--gold-soft)}.item{color:#eee7d6}.bid{font-weight:bold;color:#aee2bb}.date{grid-column:1/-1;color:#bdb6a5;font-size:13px}.empty,.error{padding:18px;border-radius:10px;background:#ffffff0a;color:var(--muted)}.error{border-left:3px solid #e6a25d}footer{text-align:center;color:#c8c0aa;font-size:13px;padding:16px}@media(max-width:560px){body{padding:16px 10px}.panel{padding:15px}.winner{grid-template-columns:1fr}.bid{grid-row:2}.date{grid-column:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head"><h1>AUCTION WINNERS</h1><p>Recent winners from Two Moon Gardens auction boards</p><a class="back" href="index.html">Return to the TMG catalogue</a></header>
+<main class="panel"><div class="status" id="status" aria-live="polite">Loading winners…</div><div id="winners"></div></main>
+<footer>Winner names, prize names, winning bids, and close dates are shown here.</footer>
+</div>
+<script>
+const SETTINGS_URL="https://raw.githubusercontent.com/Dougster00/TMG-Product-Catalogue/main/auction-board.json";
+const statusEl=document.getElementById("status"),listEl=document.getElementById("winners");
+function esc(v){const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML}
+function render(data){if(!data||!data.ok){statusEl.textContent="The winner list could not be loaded.";listEl.innerHTML='<div class="error">Please try again later.</div>';return}const rows=data.winners||[];statusEl.textContent=rows.length?"Showing the latest "+rows.length+" winners.":"No auction winners have been recorded yet.";listEl.innerHTML=rows.map(w=>'<article class="winner"><div><div class="name">'+esc(w.winner)+'</div><div class="item">'+esc(w.item)+'</div></div><div class="bid">L$'+esc(w.bid)+'</div><div class="date">'+esc(new Date(w.closed).toLocaleString())+'</div></article>').join("")}
+function load(){fetch(SETTINGS_URL+"?v="+Date.now()).then(r=>r.json()).then(s=>{const url=String(s.winner_api_url||"").trim();if(!url){statusEl.textContent="The winner list is not connected yet.";listEl.innerHTML='<div class="empty">Auction results will appear here when the winner log is connected.</div>';return}const callback="tmgWinnerCallback";window[callback]=data=>{delete window[callback];render(data)};const script=document.createElement("script");script.src=url+(url.includes("?")?"&":"?")+"callback="+callback+"&v="+Date.now();script.onerror=()=>{statusEl.textContent="The winner list could not be loaded.";listEl.innerHTML='<div class="error">Please try again later.</div>'};document.head.appendChild(script)}).catch(()=>{statusEl.textContent="The winner list could not be loaded.";listEl.innerHTML='<div class="error">Please try again later.</div>'})}
+load();
+</script>
+</body>
+</html>
