@@ -12,5 +12,6 @@
   "show_bidder": true,
   "owner_percent": 25,
   "creator_percent": 75,
-  "creator_key": "8119b045-0450-45ef-ac62-a07ba745d3ac"
+  "creator_key": "8119b045-0450-45ef-ac62-a07ba745d3ac",
+  "winner_api_url": ""
 }
