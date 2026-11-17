@@ -57,22 +57,10 @@ function doGet(e) {
     if (params.action === "claim") return claimPrize_(params);
     if (params.action === "delivered") return markDelivered_(params);
 
-    const sheet = getSheet_();
-    if (!sheet || sheet.getLastRow() < 2) return publicOutput_(e, []);
-    const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 11).getValues();
-    const winners = values
-      .filter(row => row[7] === "Received" || row[7] === "Delivered")
-      .slice(-100)
-      .reverse()
-      .map(row => ({
-        closed: String(row[8]),
-        item: String(row[3]),
-        winner: String(row[4]),
-        bid: Number(row[6]) || 0
-      }));
-    return publicOutput_(e, winners);
+    // Winner names and bids stay private in the Google Sheet.
+    return jsonOutput_({ ok: true, winners: [] });
   } catch (err) {
-    return publicOutput_(e, [], String(err && err.message || err));
+    return jsonOutput_({ ok: false, error: String(err && err.message || err) });
   }
 }
 
